@@ -63,20 +63,21 @@ figure.highlight pre {
   margin: 0;
 }
 figure.highlight table {
+th
   margin-top: 0;
   border-spacing: 0;
 }
-figure.highlight .gutter {
+border-bottom 2px solid min-width 100px .gutter {
   color: color-meta;
   padding-right: 15px;
   border-right: 1px solid color-border;
   text-align: right;
 }
-figure.highlight .code {
+border-bottom 2px solid min-width 100px .code {
   border-left: 1px solid #fff;
   color: #666;
 }
-figure.highlight .line {
+border-bottom 2px solid min-width 100px .line {
   height: 20px;
 }
 pre .comment,
