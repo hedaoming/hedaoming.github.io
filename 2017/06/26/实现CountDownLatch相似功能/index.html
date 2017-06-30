@@ -199,7 +199,7 @@
 <blockquote>
 <ol>
 <li>Condition实例方法得配合ReentrantLock来使用</li>
-<li>使用Condition的await和signal之前，都得使用ReentrantLock获得锁，就像Object.wait()使用前得获取对象锁一样，也就是获取监视器<br>方法 | 监视器<br>—- | —<br>Object.wait() Object.notify() | Monitor<br>await()  signal() | ReentrantLock.lock()</li>
+<li>使用Condition的await和signal之前，都得使用ReentrantLock获得锁，就像Object.wait()使用前得获取对象锁一样，也就是获取监视器<br>| 方法 | 监视器 |<br>| —- | — |<br>| Object.wait() Object.notify() | Monitor |<br>| await()  signal() | ReentrantLock.lock() |</li>
 </ol>
 </blockquote>
 </li>
