@@ -273,6 +273,33 @@
 
 <div class="post-preview "
      style="background-image: url('')">
+    <a href="/2017/07/03/字节码执行过程分析/">
+        <h2 class="post-title">
+            字节码执行过程分析
+        </h2>
+        <p class="post-meta">
+            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-03
+        </p>
+        
+        <h3 class="post-subtitle">
+            for语句分析
+        </h3>
+        
+        <div class="post-content-preview">
+            <p>
+                0. 引言这篇文章主要是分析了for语句以及普通变量之间在编译后是如何执行的，其中围绕着一个重点，就是变量赋值、运算都是依赖于局部变量表和操作数栈这两个重要的概念的，而局部变量表和操作数栈都位于jvm中的栈中。通过简单分析字节码执行过程，得知了static变量是会自动加入static代码块中加以..
+            </p>
+        </div>
+    </a>
+
+</div>
+
+<hr>
+
+
+
+<div class="post-preview "
+     style="background-image: url('')">
     <a href="/2017/07/03/幸福课第一节/">
         <h2 class="post-title">
             辛福课第一节
@@ -289,36 +316,6 @@
             <p>
                 1. 问题列表1. 为何阅读学术论文要注重其应用性？
 日常作业是阅读学术论文，目的是将学术论文中的内容应用到实际生活里面来，比如恋爱关系，社交等，阅读的目的是为了拓展并寻求答案，而很多内容你看过之后都只是停留在一个“哦，原来是这样的感慨中”，过后又会忘记，那么阅读的意义仅仅存在于霎那间的认知提升..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/06/30/字节码执行过程分析/">
-        <h2 class="post-title">
-            字节码执行过程分析
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-06-30
-        </p>
-        
-        <h3 class="post-subtitle">
-            for语句分析
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                
-出栈入栈操作出栈 | 常量入栈 | 局部变量入栈— | — |store | const，push | load出栈–&gt;局部变量表 | 常量–&gt;栈 | 局部变量表–&gt;栈
-
-
             </p>
         </div>
     </a>
@@ -359,6 +356,34 @@ acquire()的实现12345public final void acquire(int arg) &#123;        if (!try
 
 <div class="post-preview "
      style="background-image: url('')">
+    <a href="/2017/06/26/git使用/">
+        <h2 class="post-title">
+            git的基本使用
+        </h2>
+        <p class="post-meta">
+            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-06-26
+        </p>
+        
+        <h3 class="post-subtitle">
+            常用命令
+        </h3>
+        
+        <div class="post-content-preview">
+            <p>
+                1. 初始化一个git仓库1git init    //将当前文件夹初始化成git仓库
+2. 提交1234git add 文件1 git add 文件2   //反复使用，可添加多个文件git commit -m "描述提交信息"    //一次就可提交多个文件注意：每次修改文件后，想commi..
+            </p>
+        </div>
+    </a>
+
+</div>
+
+<hr>
+
+
+
+<div class="post-preview "
+     style="background-image: url('')">
     <a href="/2017/06/26/实现CountDownLatch相似功能/">
         <h2 class="post-title">
             实现CountDownLatch相似功能
@@ -376,34 +401,6 @@ acquire()的实现12345public final void acquire(int arg) &#123;        if (!try
                 1. CountDownLatch1.1 简介CountDownLatch是一个同步工具类，允许一个或多个线程等待其他线程操作完成后才执行，比如生活中炒菜的例子，要炒菜之前，得准备好油盐酱醋，切好菜，准备好工具，等待这些工作做完了，才可以真的炒菜，用线程方式表示就是
 
 线程A ： 炒菜线程B ：..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/06/26/git使用/">
-        <h2 class="post-title">
-            git的基本使用
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-06-26
-        </p>
-        
-        <h3 class="post-subtitle">
-            常用命令
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                1. 初始化一个git仓库1git init    //将当前文件夹初始化成git仓库
-2. 提交1234git add 文件1 git add 文件2   //反复使用，可添加多个文件git commit -m "描述提交信息"    //一次就可提交多个文件注意：每次修改文件后，想commi..
             </p>
         </div>
     </a>
