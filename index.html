@@ -273,6 +273,35 @@
 
 <div class="post-preview "
      style="background-image: url('')">
+    <a href="/2017/07/12/BlockingQueue分析/">
+        <h2 class="post-title">
+            BlockingQueue原理分析
+        </h2>
+        <p class="post-meta">
+            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-12
+        </p>
+        
+        <h3 class="post-subtitle">
+            用到了Condition和ReentrantLock
+        </h3>
+        
+        <div class="post-content-preview">
+            <p>
+                1. 介绍（作用，特性）BlockingQueue是阻塞队列，适用于生产者消费者模式，特性是在移除元素和加入元素时，遇到空队列和满队列会做出相应的阻塞操作。
+1.1 移除在空队列时，使用移除（take）会先阻塞线程，等待元素添加进来才唤醒移除线程实现移除功能
+1.2 加入在满队列时，使用加入（p..
+            </p>
+        </div>
+    </a>
+
+</div>
+
+<hr>
+
+
+
+<div class="post-preview "
+     style="background-image: url('')">
     <a href="/2017/07/03/字节码执行过程分析/">
         <h2 class="post-title">
             字节码执行过程分析
@@ -342,8 +371,7 @@
         
         <div class="post-content-preview">
             <p>
-                在此输入正文
-acquire()的实现12345public final void acquire(int arg) &#123;        if (!tryAcquire(arg) &amp;&amp;//尝试获取锁            acquireQueued(addWaiter(N..
+                1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的try..
             </p>
         </div>
     </a>
