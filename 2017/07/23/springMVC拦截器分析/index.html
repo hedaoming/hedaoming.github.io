@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.css">
     <title>
         
-        BlockingQueue原理分析｜peishen&#39;s blog
+        SpringMVC拦截器分析｜peishen&#39;s blog
         
     </title>
 
-    <link rel="canonical" href="http://yoursite.com/2017/07/12/BlockingQueue分析/">
+    <link rel="canonical" href="http://yoursite.com/2017/07/23/springMVC拦截器分析/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -145,14 +145,12 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
                 <div class="post-heading">
-                    <h1>BlockingQueue原理分析</h1>
-                    
-                    <h2 class="subheading">用到了Condition和ReentrantLock</h2>
+                    <h1>SpringMVC拦截器分析</h1>
                     
                     <span class="meta">
                          作者 peishen
                         <span>
-                          日期 2017-07-12
+                          日期 2017-07-23
                          </span>
                     </span>
                     <div class="tags text-center">
@@ -164,7 +162,7 @@
     </div>
     <div class="post-title-haojen">
         <span>
-            BlockingQueue原理分析
+            SpringMVC拦截器分析
         </span>
     </div>
 </header>
@@ -175,28 +173,21 @@
         <div class="row">
             <!-- Post Container -->
             <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
-                <h1 id="1-介绍（作用，特性）"><a href="#1-介绍（作用，特性）" class="headerlink" title="1. 介绍（作用，特性）"></a>1. 介绍（作用，特性）</h1><p>BlockingQueue是阻塞队列，适用于生产者消费者模式，特性是在移除元素和加入元素时，遇到空队列和满队列会做出相应的阻塞操作。</p>
-<h2 id="1-1-移除"><a href="#1-1-移除" class="headerlink" title="1.1 移除"></a>1.1 移除</h2><pre><code>在空队列时，使用移除（take）会先阻塞线程，等待元素添加进来才唤醒移除线程实现移除功能
-</code></pre><h2 id="1-2-加入"><a href="#1-2-加入" class="headerlink" title="1.2 加入"></a>1.2 加入</h2><pre><code>在满队列时，使用加入（put）会先阻塞线程，等待元素移除一个后才唤醒添加线程实现添加功能
-</code></pre><h1 id="2-原理解析"><a href="#2-原理解析" class="headerlink" title="2. 原理解析"></a>2. 原理解析</h1><h2 id="2-1-ReentrantLock：锁以及Condition需要"><a href="#2-1-ReentrantLock：锁以及Condition需要" class="headerlink" title="2.1 ReentrantLock：锁以及Condition需要"></a>2.1 ReentrantLock：锁以及Condition需要</h2><h2 id="2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark"><a href="#2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark" class="headerlink" title="2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)"></a>2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)</h2><pre><code>当移除元素时，会唤醒满队列导致的阻塞线程
-当加入元素时，会唤醒空队列导致的阻塞线程
-</code></pre><h1 id="3-代码解析"><a href="#3-代码解析" class="headerlink" title="3. 代码解析"></a>3. 代码解析</h1><h2 id="3-1-图解："><a href="#3-1-图解：" class="headerlink" title="3.1 图解："></a>3.1 图解：</h2><p><img src="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/12/ArrayBlockingQueue%E8%A7%A3%E6%9E%90%E5%9B%BE.png" alt=""></p>
-<h2 id="3-2-ArrayBlockingQueue源码解析"><a href="#3-2-ArrayBlockingQueue源码解析" class="headerlink" title="3.2 ArrayBlockingQueue源码解析"></a>3.2 ArrayBlockingQueue源码解析</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">ArrayBlockingQueue源码：</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(E e)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        checkNotNull(e);<span class="comment">//检查元素是否为空</span></div><div class="line">        <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">        lock.lockInterruptibly();<span class="comment">//获取锁</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">while</span> (count == items.length)</div><div class="line">                notFull.await();<span class="comment">//当队列已满时，阻塞线程，等待唤醒</span></div><div class="line">            insert(e);<span class="comment">//队列未满，加入元素（并唤醒由notEmpty导致阻塞的线程）</span></div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            lock.unlock();<span class="comment">//释放锁</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line"><span class="function"><span class="keyword">public</span> E <span class="title">take</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">        lock.lockInterruptibly();<span class="comment">//获取锁</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">while</span> (count == <span class="number">0</span>)</div><div class="line">                notEmpty.await();<span class="comment">//空队列时，阻塞线程，等待唤醒</span></div><div class="line">            <span class="keyword">return</span> extract();<span class="comment">//非空队列时，移除元素（并唤醒由notFull导致阻塞的线程）</span></div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            lock.unlock();<span class="comment">//释放锁</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-
+                <h1 id="拦截器作用介绍"><a href="#拦截器作用介绍" class="headerlink" title="拦截器作用介绍"></a>拦截器作用介绍</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;拦截器是在不改变业务代码的前提下，编织入自定义的功能，比如在登录页面中，检验登录的业务代码是不可变的，而此时要加入一些前置验证例如是否用户已登录等，此时就通过拦截器来实现，而不需要修改核心业务代码，可分离性强。</p>
+<h1 id="拦截器原理"><a href="#拦截器原理" class="headerlink" title="拦截器原理"></a>拦截器原理</h1><p>AOP的实现</p>
+<h2 id="链式回调思想"><a href="#链式回调思想" class="headerlink" title="链式回调思想"></a>链式回调思想</h2><h1 id="SpringMVC拦截器"><a href="#SpringMVC拦截器" class="headerlink" title="SpringMVC拦截器"></a>SpringMVC拦截器</h1><h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><h3 id="1-继承实现了HandlerInterceptor接口的类"><a href="#1-继承实现了HandlerInterceptor接口的类" class="headerlink" title="1. 继承实现了HandlerInterceptor接口的类"></a>1. 继承实现了HandlerInterceptor接口的类</h3><h3 id="2-实现HandlerInterceptor接口"><a href="#2-实现HandlerInterceptor接口" class="headerlink" title="2. 实现HandlerInterceptor接口"></a>2. 实现HandlerInterceptor接口</h3><p><table><br>    <tr><br>        <th>方法</th><br>        <th>作用</th><br>    </tr><br>    <tr><br>        <td>preHandle()</td><br>        <td><br>        ①前置初始化操作，在跳转到Controller之前被调，多个Interceptor时，按照声明顺序执行<br><br>        ②当返回值为false时，则不会跳转到Controller，以及不会执行接下去的postHandle和afterCompletion<br>        </td><br>    </tr><br>    <tr><br>        <td>postHandle</td><br>        <td>执行时机是在Controller请求处理之后，页面渲染前；一般对modelAndView进行操作</td><br>    </tr><br>    <tr><br>        <td>afterCompletion</td><br>        <td>整个页面渲染后才执行，一般是做清理工作，例如清理由ThreadLocal保存的本地用户信息</td><br>    </tr><br></table><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Component</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginInterceptor</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    User user;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        <span class="keyword">if</span>(user == <span class="keyword">null</span>)&#123;</div><div class="line">            <span class="comment">//操作</span></div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;<span class="comment">//不跳转到Controller以及不执行postHandle和afterCompletion方法</span></div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postHandle</span><span class="params">(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterCompletion</span><span class="params">(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="访问流程图"><a href="#访问流程图" class="headerlink" title="访问流程图"></a>访问流程图</h2><p><img src="https://github.com/hedaoming/peishen.github.io/raw/bdd6d6ecbea79912aa36cde9c461ac98829694d5/2017/07/23/SpringMVC%E6%8B%A6%E6%88%AA%E5%99%A8%E8%AF%B7%E6%B1%82%E5%9B%BE%E8%A7%A3.png" alt=""></p>
+<h2 id="原理实现"><a href="#原理实现" class="headerlink" title="原理实现"></a>原理实现</h2><h2 id="与struts拦截器的区别"><a href="#与struts拦截器的区别" class="headerlink" title="与struts拦截器的区别"></a>与struts拦截器的区别</h2><p><table><br>    <tr><br>        <th>SpringMVC拦截器</th><br>        <th>struts拦截器</th><br>    </tr><br>    <tr><br>        <td>原理是使用Spring的AOP</td><br>        <td>原理是使用xword的Interceptor</td><br>    </tr><br></table></p>
+<h1 id="拦截器与过滤器的区别"><a href="#拦截器与过滤器的区别" class="headerlink" title="拦截器与过滤器的区别"></a>拦截器与过滤器的区别</h1>
                 <hr>
                 
 
                 <ul class="pager">
                     
-                    <li class="previous">
-                        <a href="/2017/07/23/springMVC拦截器分析/" data-toggle="tooltip" data-placement="top"
-                           title="SpringMVC拦截器分析">&larr; Previous Post</a>
-                    </li>
-                    
                     
                     <li class="next">
-                        <a href="/2017/07/03/幸福课第一节/" data-toggle="tooltip" data-placement="top"
-                           title="辛福课第一节">Next Post &rarr;</a>
+                        <a href="/2017/07/12/BlockingQueue分析/" data-toggle="tooltip" data-placement="top"
+                           title="BlockingQueue原理分析">Next Post &rarr;</a>
                     </li>
                     
                 </ul>
@@ -231,7 +222,7 @@
 
             <div class="hidden-xs col-sm-3 toc-col">
                 <div class="toc-wrap">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-介绍（作用，特性）"><span class="toc-text">1. 介绍（作用，特性）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-移除"><span class="toc-text">1.1 移除</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-加入"><span class="toc-text">1.2 加入</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-原理解析"><span class="toc-text">2. 原理解析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-ReentrantLock：锁以及Condition需要"><span class="toc-text">2.1 ReentrantLock：锁以及Condition需要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark"><span class="toc-text">2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-代码解析"><span class="toc-text">3. 代码解析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-图解："><span class="toc-text">3.1 图解：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-ArrayBlockingQueue源码解析"><span class="toc-text">3.2 ArrayBlockingQueue源码解析</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#拦截器作用介绍"><span class="toc-text">拦截器作用介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#拦截器原理"><span class="toc-text">拦截器原理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#链式回调思想"><span class="toc-text">链式回调思想</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SpringMVC拦截器"><span class="toc-text">SpringMVC拦截器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本使用"><span class="toc-text">基本使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-继承实现了HandlerInterceptor接口的类"><span class="toc-text">1. 继承实现了HandlerInterceptor接口的类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-实现HandlerInterceptor接口"><span class="toc-text">2. 实现HandlerInterceptor接口</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#访问流程图"><span class="toc-text">访问流程图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#原理实现"><span class="toc-text">原理实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#与struts拦截器的区别"><span class="toc-text">与struts拦截器的区别</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#拦截器与过滤器的区别"><span class="toc-text">拦截器与过滤器的区别</span></a></li></ol>
                 </div>
             </div>
         </div>
