@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.css">
     <title>
         
-        SpringMVC拦截器分析｜peishen&#39;s blog
+        个别案例的不可靠性｜peishen&#39;s blog
         
     </title>
 
-    <link rel="canonical" href="http://yoursite.com/2017/07/23/springMVC拦截器分析/">
+    <link rel="canonical" href="http://yoursite.com/2017/07/23/个别案例的不可靠性/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -145,7 +145,9 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
                 <div class="post-heading">
-                    <h1>SpringMVC拦截器分析</h1>
+                    <h1>个别案例的不可靠性</h1>
+                    
+                    <h2 class="subheading">《对伪心理学说不》第四章</h2>
                     
                     <span class="meta">
                          作者 peishen
@@ -162,7 +164,7 @@
     </div>
     <div class="post-title-haojen">
         <span>
-            SpringMVC拦截器分析
+            个别案例的不可靠性
         </span>
     </div>
 </header>
@@ -173,15 +175,7 @@
         <div class="row">
             <!-- Post Container -->
             <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
-                <h1 id="拦截器作用介绍"><a href="#拦截器作用介绍" class="headerlink" title="拦截器作用介绍"></a>拦截器作用介绍</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;拦截器是在不改变业务代码的前提下，编织入自定义的功能，比如在登录页面中，检验登录的业务代码是不可变的，而此时要加入一些前置验证例如是否用户已登录等，此时就通过拦截器来实现，而不需要修改核心业务代码，可分离性强。</p>
-<h1 id="拦截器原理（待补充）"><a href="#拦截器原理（待补充）" class="headerlink" title="拦截器原理（待补充）"></a>拦截器原理（待补充）</h1><p>AOP的实现</p>
-<h2 id="链式回调思想（待补充）"><a href="#链式回调思想（待补充）" class="headerlink" title="链式回调思想（待补充）"></a>链式回调思想（待补充）</h2><p>同一对象多个方法的连续调用</p>
-<h1 id="SpringMVC拦截器"><a href="#SpringMVC拦截器" class="headerlink" title="SpringMVC拦截器"></a>SpringMVC拦截器</h1><h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><h3 id="1-继承实现了HandlerInterceptor接口的类"><a href="#1-继承实现了HandlerInterceptor接口的类" class="headerlink" title="1. 继承实现了HandlerInterceptor接口的类"></a>1. 继承实现了HandlerInterceptor接口的类</h3><h3 id="2-实现HandlerInterceptor接口"><a href="#2-实现HandlerInterceptor接口" class="headerlink" title="2. 实现HandlerInterceptor接口"></a>2. 实现HandlerInterceptor接口</h3><table><br>    <tr><br>        <th>方法</th><br>        <th>作用</th><br>    </tr><br>    <tr><br>        <td>preHandle()</td><br>        <td><br>        ①前置初始化操作，在跳转到Controller之前被调，多个Interceptor时，按照声明顺序执行<br><br>        ②当返回值为false时，则不会跳转到Controller，以及不会执行接下去的postHandle和afterCompletion<br>        </td><br>    </tr><br>    <tr><br>        <td>postHandle</td><br>        <td>执行时机是在Controller请求处理之后，页面渲染前；一般对modelAndView进行操作</td><br>    </tr><br>    <tr><br>        <td>afterCompletion</td><br>        <td>整个页面渲染后才执行，一般是做清理工作，例如清理由ThreadLocal保存的本地用户信息</td><br>    </tr><br></table><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Component</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginInterceptor</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    User user;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        <span class="keyword">if</span>(user == <span class="keyword">null</span>)&#123;</div><div class="line">            <span class="comment">//操作</span></div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;<span class="comment">//不跳转到Controller以及不执行postHandle和afterCompletion方法</span></div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postHandle</span><span class="params">(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterCompletion</span><span class="params">(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure><br><br>## 访问流程图<br><img src="https://github.com/hedaoming/peishen.github.io/raw/bdd6d6ecbea79912aa36cde9c461ac98829694d5/2017/07/23/SpringMVC%E6%8B%A6%E6%88%AA%E5%99%A8%E8%AF%B7%E6%B1%82%E5%9B%BE%E8%A7%A3.png" alt=""><br>## 原理实现<br>## 与struts拦截器的区别<br><table><br>    <tr><br>        <th>SpringMVC拦截器</th><br>        <th>struts拦截器</th><br>    </tr><br>    <tr><br>        <td>原理是AOP，基于IoC基础<br>底层使用动态代理和CGLIB代理两种方式结合</td><br>        <td>原理也是AOP，使用xword的Interceptor</td><br>    </tr><br></table><br># 拦截器与过滤器的区别<br><table><br>    <tr><br>        <th>SpringMVC拦截器</th><br>        <th>过滤器</th><br>    </tr><br>    <tr><br>        <td>SpringMVC拦截器适用范围广，能用到application和web中</td><br>        <td>过滤器是servlet规定的，只能在servlet中使用</td><br>    </tr><br>    <tr><br>        <td>拦截器能够深入到方法前后，更加深入，有更大的弹性</td><br>        <td>filter只能在servlet前后使用，不能深入方法</td><br>    </tr><br></table>
-
-
-
-
-
+                <p>论点：个体案例不足以证实某一事实。<br>论据：<br>    个体案例只是局部有效。例子：流传于网络的UFO见证，某自称工作于NASA的工作人员的爆料，媒体注重时效性而不是真实性。<br>    个体案例有时是自己的心理暗示。你见到的事实是你自己想让自己看到的事实。安慰剂效应。<br>你见到的事实是别人想让你看到的事实</p>
 
                 <hr>
                 
@@ -189,14 +183,14 @@
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/2017/07/24/token的分析/" data-toggle="tooltip" data-placement="top"
-                           title="token维持登录状态">&larr; Previous Post</a>
+                        <a href="/2017/07/23/springMVC拦截器分析/" data-toggle="tooltip" data-placement="top"
+                           title="SpringMVC拦截器分析">&larr; Previous Post</a>
                     </li>
                     
                     
                     <li class="next">
-                        <a href="/2017/07/23/个别案例的不可靠性/" data-toggle="tooltip" data-placement="top"
-                           title="个别案例的不可靠性">Next Post &rarr;</a>
+                        <a href="/2017/07/12/BlockingQueue分析/" data-toggle="tooltip" data-placement="top"
+                           title="BlockingQueue原理分析">Next Post &rarr;</a>
                     </li>
                     
                 </ul>
@@ -231,7 +225,7 @@
 
             <div class="hidden-xs col-sm-3 toc-col">
                 <div class="toc-wrap">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#拦截器作用介绍"><span class="toc-text">拦截器作用介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#拦截器原理（待补充）"><span class="toc-text">拦截器原理（待补充）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#链式回调思想（待补充）"><span class="toc-text">链式回调思想（待补充）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SpringMVC拦截器"><span class="toc-text">SpringMVC拦截器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本使用"><span class="toc-text">基本使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-继承实现了HandlerInterceptor接口的类"><span class="toc-text">1. 继承实现了HandlerInterceptor接口的类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-实现HandlerInterceptor接口"><span class="toc-text">2. 实现HandlerInterceptor接口</span></a></li></ol></li></ol></li></ol>
+                    
                 </div>
             </div>
         </div>
