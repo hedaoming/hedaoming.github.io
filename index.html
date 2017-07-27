@@ -282,12 +282,13 @@
         </p>
         
         <h3 class="post-subtitle">
-            token与session的一些区别
+            三种认知机制
         </h3>
         
         <div class="post-content-preview">
             <p>
-                token的介绍token是使用令牌的形式去验证当前用户，而session是通过客户端与服务端的比较来验证当前用户，比如去银行办业务，需要使用自己的身份证，此时身份证就是session，而银行要验证你的信息，就需要查看银行内部保存的身份证信息是否和你持有的一致，若一致才证明你的权限；而用toke..
+                1. token的介绍
+&nbsp;&nbsp;&nbsp;&nbsp;token是使用令牌的形式去验证当前用户，而session是通过客户端与服务端的比较来验证当前用户，比如去银行办业务，需要使用自己的身份证，此时身份证就是session，而银行要验证你的信息，就需要查看银行内部保存的身份证信..
             </p>
         </div>
     </a>
@@ -310,7 +311,7 @@
         
         <div class="post-content-preview">
             <p>
-                拦截器作用介绍&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;拦截器是在不改变业务代码的前提下，编织入自定义的功能，比如在登录页面中，检验登录的业务代码是不可变的，而此时要加入一些前置验证例如是否用户已登录等，此时就通过拦截器来实现，而不需要修改核心业务代码，可分离性强。..
+                1. 拦截器作用介绍&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;拦截器是在不改变业务代码的前提下，编织入自定义的功能，比如在登录页面中，检验登录的业务代码是不可变的，而此时要加入一些前置验证例如是否用户已登录等，此时就通过拦截器来实现，而不需要修改核心业务代码，可分离..
             </p>
         </div>
     </a>
@@ -380,6 +381,33 @@
 
 <div class="post-preview "
      style="background-image: url('')">
+    <a href="/2017/07/03/字节码执行过程分析/">
+        <h2 class="post-title">
+            字节码执行过程分析
+        </h2>
+        <p class="post-meta">
+            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-03
+        </p>
+        
+        <h3 class="post-subtitle">
+            for语句分析
+        </h3>
+        
+        <div class="post-content-preview">
+            <p>
+                0. 引言这篇文章主要是分析了for语句以及普通变量之间在编译后是如何执行的，其中围绕着一个重点，就是变量赋值、运算都是依赖于局部变量表和操作数栈这两个重要的概念的，而局部变量表和操作数栈都位于jvm中的栈中。通过简单分析字节码执行过程，得知了static变量是会自动加入static代码块中加以..
+            </p>
+        </div>
+    </a>
+
+</div>
+
+<hr>
+
+
+
+<div class="post-preview "
+     style="background-image: url('')">
     <a href="/2017/07/03/幸福课第一节/">
         <h2 class="post-title">
             辛福课第一节
@@ -396,33 +424,6 @@
             <p>
                 1. 问题列表1. 为何阅读学术论文要注重其应用性？
 日常作业是阅读学术论文，目的是将学术论文中的内容应用到实际生活里面来，比如恋爱关系，社交等，阅读的目的是为了拓展并寻求答案，而很多内容你看过之后都只是停留在一个“哦，原来是这样的感慨中”，过后又会忘记，那么阅读的意义仅仅存在于霎那间的认知提升..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/07/03/字节码执行过程分析/">
-        <h2 class="post-title">
-            字节码执行过程分析
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-03
-        </p>
-        
-        <h3 class="post-subtitle">
-            for语句分析
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                0. 引言这篇文章主要是分析了for语句以及普通变量之间在编译后是如何执行的，其中围绕着一个重点，就是变量赋值、运算都是依赖于局部变量表和操作数栈这两个重要的概念的，而局部变量表和操作数栈都位于jvm中的栈中。通过简单分析字节码执行过程，得知了static变量是会自动加入static代码块中加以..
             </p>
         </div>
     </a>
