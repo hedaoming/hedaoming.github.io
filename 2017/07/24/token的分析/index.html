@@ -177,14 +177,18 @@
             <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
                 <h1 id="1-token的介绍"><a href="#1-token的介绍" class="headerlink" title="1. token的介绍"></a>1. token的介绍</h1><blockquote>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;token是使用令牌的形式去验证当前用户，而session是通过客户端与服务端的比较来验证当前用户，比如去银行办业务，需要使用自己的身份证，此时身份证就是session，而银行要验证你的信息，就需要查看银行内部保存的身份证信息是否和你持有的一致，若一致才证明你的权限；而用token的形式则只需要使用自己的身份证即可，不必与银行内部保存的身份证信息去比对，从而使得验证更加简单。</p>
-<h1 id="2-几个认证机制的分析"><a href="#2-几个认证机制的分析" class="headerlink" title="2. 几个认证机制的分析"></a>2. 几个认证机制的分析</h1><h2 id="2-1-HTTP-Basic-Auth"><a href="#2-1-HTTP-Basic-Auth" class="headerlink" title="2.1 HTTP Basic Auth"></a>2.1 HTTP Basic Auth</h2><p>&nbsp;&nbsp;&nbsp;&nbsp;HTTP基本认证适应范围广，基本的网页浏览器都支持这个认证，不过有一个缺点就是传输的信很容易就泄露出去，虽然用户名及密码以BASE64加密，但是BASE64加密强度很低，在登录时，客户端发送用户名和密码这一过程很容易就被拦截，所以安全性低。</p>
-<h2 id="2-2-OAuth"><a href="#2-2-OAuth" class="headerlink" title="2.2 OAuth"></a>2.2 OAuth</h2><p>&nbsp;&nbsp;&nbsp;&nbsp;<font color="red">OAuth通过开放授权的方式实现认证功能</font>，当用户登录时，服务器会生成一个令牌（token），此令牌就标识着这个用户，并发送给用户，往后用户发送其他请求时，只需要讲令牌发送到服务端，而不用再次发送用户名和密码来验证身份权限，有时为了安全性，会对token进行一些加密处理，通过salt等方法来加强密码。<br>&nbsp;&nbsp;&nbsp;&nbsp;下图用熟悉的场景来描述，比如想<font color="red">浏览新闻网页时想评论</font>，而自己又没有注册过该网站的帐号，它就提供了注册方法以及使用google帐号登录的方法，此时选择google帐号登录，所以此时关系如下：<br>①资源拥有者：我们的google帐号<br>②验证服务器：google服务器<br>③资源服务器：新闻网站<br><br>&nbsp;&nbsp;&nbsp;&nbsp;所以首先新闻网站会请求我们已登录的google帐号授权，拿到授权许可后再请求google服务器，返回一个令牌，再利用这个令牌实现评论功能。在这个场景中，第三方网站不会拿到我们的密码等信息，就避免了信息泄漏等问题，同时通过令牌满足同样的需求，此时要是第三方网站拿到这个令牌或者这个令牌被人盗取，用这个令牌去登录我的google帐号那不是不安全了吗？其实在google授权后，<font color="red">不会将全部的权利都赋予令牌</font>，可能就将用户名以及部分信息授权这个令牌操作，而当涉及敏感部分，这个令牌的等级就不够了，无法操作，保证了安全性。</p>
+</blockquote>
+<h1 id="2-几个认证机制的分析"><a href="#2-几个认证机制的分析" class="headerlink" title="2. 几个认证机制的分析"></a>2. 几个认证机制的分析</h1><h2 id="2-1-HTTP-Basic-Auth"><a href="#2-1-HTTP-Basic-Auth" class="headerlink" title="2.1 HTTP Basic Auth"></a>2.1 HTTP Basic Auth</h2><blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;HTTP基本认证适应范围广，基本的网页浏览器都支持这个认证，不过有一个缺点就是传输的信很容易就泄露出去，虽然用户名及密码以BASE64加密，但是BASE64加密强度很低，在登录时，客户端发送用户名和密码这一过程很容易就被拦截，所以安全性低。</p>
+</blockquote>
+<h2 id="2-2-OAuth"><a href="#2-2-OAuth" class="headerlink" title="2.2 OAuth"></a>2.2 OAuth</h2><blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<font color="red">OAuth通过开放授权的方式实现认证功能</font>，当用户登录时，服务器会生成一个令牌（token），此令牌就标识着这个用户，并发送给用户，往后用户发送其他请求时，只需要讲令牌发送到服务端，而不用再次发送用户名和密码来验证身份权限，有时为了安全性，会对token进行一些加密处理，通过salt等方法来加强密码。<br>&nbsp;&nbsp;&nbsp;&nbsp;下图用熟悉的场景来描述，比如想<font color="red">浏览新闻网页时想评论</font>，而自己又没有注册过该网站的帐号，它就提供了注册方法以及使用google帐号登录的方法，此时选择google帐号登录，所以此时关系如下：<br>①资源拥有者：我们的google帐号<br>②验证服务器：google服务器<br>③资源服务器：新闻网站<br><br>&nbsp;&nbsp;&nbsp;&nbsp;所以首先新闻网站会请求我们已登录的google帐号授权，拿到授权许可后再请求google服务器，返回一个令牌，再利用这个令牌实现评论功能。在这个场景中，第三方网站不会拿到我们的密码等信息，就避免了信息泄漏等问题，同时通过令牌满足同样的需求，此时要是第三方网站拿到这个令牌或者这个令牌被人盗取，用这个令牌去登录我的google帐号那不是不安全了吗？其实在google授权后，<font color="red">不会将全部的权利都赋予令牌</font>，可能就将用户名以及部分信息授权这个令牌操作，而当涉及敏感部分，这个令牌的等级就不够了，无法操作，保证了安全性。</p>
 </blockquote>
 <p><img src="https://github.com/hedaoming/peishen.github.io/raw/0133555fc95950b08222ce0fe28ee9c66c54cfcb/2017/07/24/OAuth.png" alt=""></p>
 <h2 id="2-3-Cookie-Auth"><a href="#2-3-Cookie-Auth" class="headerlink" title="2.3 Cookie Auth"></a>2.3 Cookie Auth</h2><blockquote>
 <p>cookie认知机制，就是在请求发出到服务端后，服务端会新建一个session对象，同时客户端也会新建一个cookie对象，通过客户端的Cookie与服务端的Session匹配来实现状态管理。</p>
-<h1 id="3-token与session的区别"><a href="#3-token与session的区别" class="headerlink" title="3. token与session的区别"></a>3. token与session的区别</h1><p><img src="https://github.com/hedaoming/peishen.github.io/raw/0133555fc95950b08222ce0fe28ee9c66c54cfcb/2017/07/24/token%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB.png" alt=""></p>
 </blockquote>
+<h1 id="3-token与session的区别"><a href="#3-token与session的区别" class="headerlink" title="3. token与session的区别"></a>3. token与session的区别</h1><p><img src="https://github.com/hedaoming/peishen.github.io/raw/0133555fc95950b08222ce0fe28ee9c66c54cfcb/2017/07/24/token%E5%92%8Csession%E7%9A%84%E5%8C%BA%E5%88%AB.png" alt=""></p>
 
                 <hr>
                 
