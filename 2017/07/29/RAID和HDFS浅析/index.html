@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.css">
     <title>
         
-        BlockingQueue原理分析｜peishen&#39;s blog
+        RAID和HDFS浅析｜peishen&#39;s blog
         
     </title>
 
-    <link rel="canonical" href="http://yoursite.com/2017/07/12/BlockingQueue分析/">
+    <link rel="canonical" href="http://yoursite.com/2017/07/29/RAID和HDFS浅析/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -145,14 +145,14 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
                 <div class="post-heading">
-                    <h1>BlockingQueue原理分析</h1>
+                    <h1>RAID和HDFS浅析</h1>
                     
-                    <h2 class="subheading">用到了Condition和ReentrantLock</h2>
+                    <h2 class="subheading">RAID种类以及与HDFS的区别</h2>
                     
                     <span class="meta">
                          作者 peishen
                         <span>
-                          日期 2017-07-12
+                          日期 2017-07-29
                          </span>
                     </span>
                     <div class="tags text-center">
@@ -164,7 +164,7 @@
     </div>
     <div class="post-title-haojen">
         <span>
-            BlockingQueue原理分析
+            RAID和HDFS浅析
         </span>
     </div>
 </header>
@@ -175,28 +175,26 @@
         <div class="row">
             <!-- Post Container -->
             <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
-                <h1 id="1-介绍（作用，特性）"><a href="#1-介绍（作用，特性）" class="headerlink" title="1. 介绍（作用，特性）"></a>1. 介绍（作用，特性）</h1><p>BlockingQueue是阻塞队列，适用于生产者消费者模式，特性是在移除元素和加入元素时，遇到空队列和满队列会做出相应的阻塞操作。</p>
-<h2 id="1-1-移除"><a href="#1-1-移除" class="headerlink" title="1.1 移除"></a>1.1 移除</h2><pre><code>在空队列时，使用移除（take）会先阻塞线程，等待元素添加进来才唤醒移除线程实现移除功能
-</code></pre><h2 id="1-2-加入"><a href="#1-2-加入" class="headerlink" title="1.2 加入"></a>1.2 加入</h2><pre><code>在满队列时，使用加入（put）会先阻塞线程，等待元素移除一个后才唤醒添加线程实现添加功能
-</code></pre><h1 id="2-原理解析"><a href="#2-原理解析" class="headerlink" title="2. 原理解析"></a>2. 原理解析</h1><h2 id="2-1-ReentrantLock：锁以及Condition需要"><a href="#2-1-ReentrantLock：锁以及Condition需要" class="headerlink" title="2.1 ReentrantLock：锁以及Condition需要"></a>2.1 ReentrantLock：锁以及Condition需要</h2><h2 id="2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark"><a href="#2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark" class="headerlink" title="2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)"></a>2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)</h2><pre><code>当移除元素时，会唤醒满队列导致的阻塞线程
-当加入元素时，会唤醒空队列导致的阻塞线程
-</code></pre><h1 id="3-代码解析"><a href="#3-代码解析" class="headerlink" title="3. 代码解析"></a>3. 代码解析</h1><h2 id="3-1-图解："><a href="#3-1-图解：" class="headerlink" title="3.1 图解："></a>3.1 图解：</h2><p><img src="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/12/ArrayBlockingQueue%E8%A7%A3%E6%9E%90%E5%9B%BE.png" alt=""></p>
-<h2 id="3-2-ArrayBlockingQueue源码解析"><a href="#3-2-ArrayBlockingQueue源码解析" class="headerlink" title="3.2 ArrayBlockingQueue源码解析"></a>3.2 ArrayBlockingQueue源码解析</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">ArrayBlockingQueue源码：</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(E e)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        checkNotNull(e);<span class="comment">//检查元素是否为空</span></div><div class="line">        <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">        lock.lockInterruptibly();<span class="comment">//获取锁</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">while</span> (count == items.length)</div><div class="line">                notFull.await();<span class="comment">//当队列已满时，阻塞线程，等待唤醒</span></div><div class="line">            insert(e);<span class="comment">//队列未满，加入元素（并唤醒由notEmpty导致阻塞的线程）</span></div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            lock.unlock();<span class="comment">//释放锁</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line"><span class="function"><span class="keyword">public</span> E <span class="title">take</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">        lock.lockInterruptibly();<span class="comment">//获取锁</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">while</span> (count == <span class="number">0</span>)</div><div class="line">                notEmpty.await();<span class="comment">//空队列时，阻塞线程，等待唤醒</span></div><div class="line">            <span class="keyword">return</span> extract();<span class="comment">//非空队列时，移除元素（并唤醒由notFull导致阻塞的线程）</span></div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            lock.unlock();<span class="comment">//释放锁</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+                <h1 id="1-RAID"><a href="#1-RAID" class="headerlink" title="1. RAID"></a>1. RAID</h1><h2 id="1-1-作用"><a href="#1-1-作用" class="headerlink" title="1.1 作用"></a>1.1 作用</h2><p> &nbsp;&nbsp;&nbsp;&nbsp;RAID（Redundant Array of Independent Disks ），廉价磁盘冗余阵列，作用是为了<strong>改善磁盘的访问延迟</strong>（通过并发访问），<strong>增强磁盘的可靠性</strong>（通过多磁盘备份）和<strong>容错能力</strong>（通过存储校验数据磁盘恢复数据），通过多块廉价磁盘的组合来实现一个性格强大的昂贵磁盘功能，从上面可以得知，RAID的特点主要是三个，<strong>由这三个特点来构成不同类别的RAID</strong>。<br>&nbsp;&nbsp;&nbsp;&nbsp;①&nbsp;&nbsp;并发访问<br>&nbsp;&nbsp;&nbsp;&nbsp;②&nbsp;&nbsp;数据备份<br>&nbsp;&nbsp;&nbsp;&nbsp;③&nbsp;&nbsp;恢复能力（容错）</p>
+<h2 id="1-2-种类"><a href="#1-2-种类" class="headerlink" title="1.2 种类"></a>1.2 种类</h2><h3 id="1-2-1-特性区别"><a href="#1-2-1-特性区别" class="headerlink" title="1.2.1 特性区别"></a>1.2.1 特性区别</h3><p><img src="https://github.com/hedaoming/peishen.github.io/raw/1750488436a9ea5b158bddf055d4967a2a9ada35/2017/07/29/RAID%E5%90%84%E4%B8%AA%E7%A7%8D%E7%B1%BB%E5%8C%BA%E5%88%AB.png" alt=""></p>
+<h3 id="1-2-2-图解"><a href="#1-2-2-图解" class="headerlink" title="1.2.2 图解"></a>1.2.2 图解</h3><p><img src="https://github.com/hedaoming/peishen.github.io/raw/1750488436a9ea5b158bddf055d4967a2a9ada35/2017/07/29/RAID%E5%90%84%E7%A7%8D%E7%B1%BB%E5%9B%BE%E8%A7%A3.png" alt=""></p>
+<h3 id="1-2-3特点"><a href="#1-2-3特点" class="headerlink" title="1.2.3特点"></a>1.2.3特点</h3><p><img src="https://github.com/hedaoming/peishen.github.io/raw/1750488436a9ea5b158bddf055d4967a2a9ada35/2017/07/29/%E7%89%B9%E7%82%B9.png" alt=""></p>
+<h1 id="2-HDFS"><a href="#2-HDFS" class="headerlink" title="2. HDFS"></a>2. HDFS</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;HDFS是Hadoop的分布式文件系统，系统在整个存储集群的多台服务器上进行数据并发读写和备份，在服务器集群规模上实现了类似RAID的功能。</p>
+<h2 id="2-1-图解"><a href="#2-1-图解" class="headerlink" title="2.1 图解"></a>2.1 图解</h2><p><img src="https://github.com/hedaoming/peishen.github.io/raw/26d549f4f577f5ea4287d37ba040031db179f384/2017/07/29/HDFS%E5%9B%BE%E8%A7%A3.png" alt=""><br><img src="https://github.com/hedaoming/peishen.github.io/raw/26d549f4f577f5ea4287d37ba040031db179f384/2017/07/29/HDFS%E5%86%99%E6%96%87%E4%BB%B6%E6%B5%81%E7%A8%8B.png" alt=""></p>
+<h1 id="3-总结：RAID与HDFS关系"><a href="#3-总结：RAID与HDFS关系" class="headerlink" title="3. 总结：RAID与HDFS关系"></a>3. 总结：RAID与HDFS关系</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;RAID是多个磁盘进行组合实现并发、备份、容错等功能，而HDFS则是在服务器集群上实现并发、备份等功能，在分布式文件系统中，HDFS更加普及，而在关系数据库及传统文件系统中，RAID应用广泛。</p>
+<h1 id="4-参考文章"><a href="#4-参考文章" class="headerlink" title="4. 参考文章"></a>4. 参考文章</h1><blockquote>
+<p>《大型网站技术架构：核心原理与案例分析》　　李智慧著　　第四章</p>
+</blockquote>
 
                 <hr>
                 
 
                 <ul class="pager">
                     
-                    <li class="previous">
-                        <a href="/2017/07/23/springMVC拦截器分析/" data-toggle="tooltip" data-placement="top"
-                           title="SpringMVC拦截器分析">&larr; Previous Post</a>
-                    </li>
-                    
                     
                     <li class="next">
-                        <a href="/2017/07/03/字节码执行过程分析/" data-toggle="tooltip" data-placement="top"
-                           title="字节码执行过程分析">Next Post &rarr;</a>
+                        <a href="/2017/07/27/ThreadLocal浅析/" data-toggle="tooltip" data-placement="top"
+                           title="ThreadLocal浅析">Next Post &rarr;</a>
                     </li>
                     
                 </ul>
@@ -231,7 +229,7 @@
 
             <div class="hidden-xs col-sm-3 toc-col">
                 <div class="toc-wrap">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-介绍（作用，特性）"><span class="toc-text">1. 介绍（作用，特性）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-移除"><span class="toc-text">1.1 移除</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-加入"><span class="toc-text">1.2 加入</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-原理解析"><span class="toc-text">2. 原理解析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-ReentrantLock：锁以及Condition需要"><span class="toc-text">2.1 ReentrantLock：锁以及Condition需要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark"><span class="toc-text">2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-代码解析"><span class="toc-text">3. 代码解析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-图解："><span class="toc-text">3.1 图解：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-ArrayBlockingQueue源码解析"><span class="toc-text">3.2 ArrayBlockingQueue源码解析</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-RAID"><span class="toc-text">1. RAID</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-作用"><span class="toc-text">1.1 作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-种类"><span class="toc-text">1.2 种类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-1-特性区别"><span class="toc-text">1.2.1 特性区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-2-图解"><span class="toc-text">1.2.2 图解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-3特点"><span class="toc-text">1.2.3特点</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-HDFS"><span class="toc-text">2. HDFS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-图解"><span class="toc-text">2.1 图解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-总结：RAID与HDFS关系"><span class="toc-text">3. 总结：RAID与HDFS关系</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-参考文章"><span class="toc-text">4. 参考文章</span></a></li></ol>
                 </div>
             </div>
         </div>

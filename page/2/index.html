@@ -22,7 +22,7 @@
         
     </title>
 
-    <link rel="canonical" href="http://yoursite.com/">
+    <link rel="canonical" href="http://yoursite.com/page/2/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -273,270 +273,46 @@
 
 <div class="post-preview "
      style="background-image: url('')">
-    <a href="/2017/07/29/RAID和HDFS浅析/">
+    <a href="/2017/06/26/实现CountDownLatch相似功能/">
         <h2 class="post-title">
-            RAID和HDFS浅析
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-29
-        </p>
-        
-        <h3 class="post-subtitle">
-            RAID种类以及与HDFS的区别
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                1. RAID1.1 作用 &nbsp;&nbsp;&nbsp;&nbsp;RAID（Redundant Array of Independent Disks ），廉价磁盘冗余阵列，作用是为了改善磁盘的访问延迟（通过并发访问），增强磁盘的可靠性（通过多磁盘备份）和容错能力（通过存储校验数据磁盘恢..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/07/27/ThreadLocal浅析/">
-        <h2 class="post-title">
-            ThreadLocal浅析
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-27
-        </p>
-        
-        <h3 class="post-subtitle">
-            原理浅析
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                1. ThreadLocal介绍
-ThreadLocal提供了线程局部变量，每个线程都有各自独立的局部变量，其他线程无法访问得到，这就隔离多个线程之间的资源共享问题，也不会出现线程安全问题，而一般应用是在数据库连接，或者session等地方。
-
-1.1 应用：数据库连接
-操作数据库连接时，有ge..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/07/24/token的分析/">
-        <h2 class="post-title">
-            token维持登录状态
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-24
-        </p>
-        
-        <h3 class="post-subtitle">
-            三种认知机制
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                1. token的介绍
-&nbsp;&nbsp;&nbsp;&nbsp;token是使用令牌的形式去验证当前用户，而session是通过客户端与服务端的比较来验证当前用户，比如去银行办业务，需要使用自己的身份证，此时身份证就是session，而银行要验证你的信息，就需要查看银行内部保存的身份证信..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/07/23/个别案例的不可靠性/">
-        <h2 class="post-title">
-            个别案例的不可靠性
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-23
-        </p>
-        
-        <h3 class="post-subtitle">
-            《对伪心理学说不》第四章
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                论点：个体案例不足以证实某一事实。论据：    个体案例只是局部有效。例子：流传于网络的UFO见证，某自称工作于NASA的工作人员的爆料，媒体注重时效性而不是真实性。    个体案例有时是自己的心理暗示。你见到的事实是你自己想让自己看到的事实。安慰剂效应。你见到的事实是别人想让你看到的事实
-
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/07/23/springMVC拦截器分析/">
-        <h2 class="post-title">
-            SpringMVC拦截器分析
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-23
-        </p>
-        
-        <div class="post-content-preview">
-            <p>
-                1. 拦截器作用介绍&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;拦截器是在不改变业务代码的前提下，编织入自定义的功能，比如在登录页面中，检验登录的业务代码是不可变的，而此时要加入一些前置验证例如是否用户已登录等，此时就通过拦截器来实现，而不需要修改核心业务代码，可分离..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/07/12/BlockingQueue分析/">
-        <h2 class="post-title">
-            BlockingQueue原理分析
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-12
-        </p>
-        
-        <h3 class="post-subtitle">
-            用到了Condition和ReentrantLock
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                1. 介绍（作用，特性）BlockingQueue是阻塞队列，适用于生产者消费者模式，特性是在移除元素和加入元素时，遇到空队列和满队列会做出相应的阻塞操作。
-1.1 移除在空队列时，使用移除（take）会先阻塞线程，等待元素添加进来才唤醒移除线程实现移除功能
-1.2 加入在满队列时，使用加入（p..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/07/03/字节码执行过程分析/">
-        <h2 class="post-title">
-            字节码执行过程分析
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-03
-        </p>
-        
-        <h3 class="post-subtitle">
-            for语句分析
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                0. 引言这篇文章主要是分析了for语句以及普通变量之间在编译后是如何执行的，其中围绕着一个重点，就是变量赋值、运算都是依赖于局部变量表和操作数栈这两个重要的概念的，而局部变量表和操作数栈都位于jvm中的栈中。通过简单分析字节码执行过程，得知了static变量是会自动加入static代码块中加以..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/07/03/幸福课第一节/">
-        <h2 class="post-title">
-            辛福课第一节
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-03
-        </p>
-        
-        <h3 class="post-subtitle">
-            课程记录
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                1. 问题列表1. 为何阅读学术论文要注重其应用性？
-日常作业是阅读学术论文，目的是将学术论文中的内容应用到实际生活里面来，比如恋爱关系，社交等，阅读的目的是为了拓展并寻求答案，而很多内容你看过之后都只是停留在一个“哦，原来是这样的感慨中”，过后又会忘记，那么阅读的意义仅仅存在于霎那间的认知提升..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/06/30/AQS分析/">
-        <h2 class="post-title">
-            AbstractQueuedSynchronizer源码分析
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-06-30
-        </p>
-        
-        <h3 class="post-subtitle">
-            AQS是很多并发包的基础
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的try..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
-    <a href="/2017/06/26/git使用/">
-        <h2 class="post-title">
-            git的基本使用
+            实现CountDownLatch相似功能
         </h2>
         <p class="post-meta">
             <i class="fa fa-calendar" aria-hidden="true"></i> 2017-06-26
         </p>
         
         <h3 class="post-subtitle">
-            常用命令
+            原理是使用Condition和ReentrantLock
         </h3>
         
         <div class="post-content-preview">
             <p>
-                1. 初始化一个git仓库1git init    //将当前文件夹初始化成git仓库
-2. 提交1234git add 文件1 git add 文件2   //反复使用，可添加多个文件git commit -m "描述提交信息"    //一次就可提交多个文件注意：每次修改文件后，想commi..
+                1. CountDownLatch1.1 简介CountDownLatch是一个同步工具类，允许一个或多个线程等待其他线程操作完成后才执行，比如生活中炒菜的例子，要炒菜之前，得准备好油盐酱醋，切好菜，准备好工具，等待这些工作做完了，才可以真的炒菜，用线程方式表示就是
+
+线程A ： 炒菜线程B ：..
+            </p>
+        </div>
+    </a>
+
+</div>
+
+<hr>
+
+
+
+<div class="post-preview "
+     style="background-image: url('')">
+    <a href="/2017/06/25/HashMap源码分析/">
+        <h2 class="post-title">
+            HashMap源码分析
+        </h2>
+        <p class="post-meta">
+            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-06-25
+        </p>
+        
+        <div class="post-content-preview">
+            <p>
+                
             </p>
         </div>
     </a>
@@ -552,10 +328,10 @@ ThreadLocal提供了线程局部变量，每个线程都有各自独立的局部
 
 <ul class="pager">
     
-    
-    <li class="next">
-        <a href="/page/2/">Older Posts &rarr;</a>
+    <li class="previous">
+        <a href="/">&larr; Newer Posts</a>
     </li>
+    
     
 </ul>
 
