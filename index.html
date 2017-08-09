@@ -273,6 +273,34 @@
 
 <div class="post-preview "
      style="background-image: url('')">
+    <a href="/2017/08/10/缓存池/">
+        <h2 class="post-title">
+            缓存池
+        </h2>
+        <p class="post-meta">
+            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-08-10
+        </p>
+        
+        <h3 class="post-subtitle">
+            基本类型包装类缓存池
+        </h3>
+        
+        <div class="post-content-preview">
+            <p>
+                1. 缓存池介绍
+&nbsp;&nbsp;&nbsp;&nbsp;基本数据类型包装类除了Float和Double之外，其他六个包装类都有常量缓存池，拿Integer来举例子，Integer类内部中内置了 256个Integer类型数据，当使用的数据范围在 -128~127之间时，会直接返回常量池..
+            </p>
+        </div>
+    </a>
+
+</div>
+
+<hr>
+
+
+
+<div class="post-preview "
+     style="background-image: url('')">
     <a href="/2017/08/09/线程池介绍/">
         <h2 class="post-title">
             线程池介绍
@@ -470,33 +498,6 @@ ThreadLocal提供了线程局部变量，每个线程都有各自独立的局部
 
 <div class="post-preview "
      style="background-image: url('')">
-    <a href="/2017/07/03/字节码执行过程分析/">
-        <h2 class="post-title">
-            字节码执行过程分析
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-03
-        </p>
-        
-        <h3 class="post-subtitle">
-            for语句分析
-        </h3>
-        
-        <div class="post-content-preview">
-            <p>
-                0. 引言这篇文章主要是分析了for语句以及普通变量之间在编译后是如何执行的，其中围绕着一个重点，就是变量赋值、运算都是依赖于局部变量表和操作数栈这两个重要的概念的，而局部变量表和操作数栈都位于jvm中的栈中。通过简单分析字节码执行过程，得知了static变量是会自动加入static代码块中加以..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
     <a href="/2017/07/03/幸福课第一节/">
         <h2 class="post-title">
             辛福课第一节
@@ -525,21 +526,21 @@ ThreadLocal提供了线程局部变量，每个线程都有各自独立的局部
 
 <div class="post-preview "
      style="background-image: url('')">
-    <a href="/2017/06/30/AQS分析/">
+    <a href="/2017/07/03/字节码执行过程分析/">
         <h2 class="post-title">
-            AbstractQueuedSynchronizer源码分析
+            字节码执行过程分析
         </h2>
         <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-06-30
+            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-03
         </p>
         
         <h3 class="post-subtitle">
-            AQS是很多并发包的基础
+            for语句分析
         </h3>
         
         <div class="post-content-preview">
             <p>
-                1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的try..
+                0. 引言这篇文章主要是分析了for语句以及普通变量之间在编译后是如何执行的，其中围绕着一个重点，就是变量赋值、运算都是依赖于局部变量表和操作数栈这两个重要的概念的，而局部变量表和操作数栈都位于jvm中的栈中。通过简单分析字节码执行过程，得知了static变量是会自动加入static代码块中加以..
             </p>
         </div>
     </a>

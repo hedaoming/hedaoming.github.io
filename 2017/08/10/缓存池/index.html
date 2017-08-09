@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.css">
     <title>
         
-        BlockingQueue原理分析｜peishen&#39;s blog
+        缓存池｜peishen&#39;s blog
         
     </title>
 
-    <link rel="canonical" href="http://yoursite.com/2017/07/12/BlockingQueue分析/">
+    <link rel="canonical" href="http://yoursite.com/2017/08/10/缓存池/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -145,14 +145,14 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
                 <div class="post-heading">
-                    <h1>BlockingQueue原理分析</h1>
+                    <h1>缓存池</h1>
                     
-                    <h2 class="subheading">用到了Condition和ReentrantLock</h2>
+                    <h2 class="subheading">基本类型包装类缓存池</h2>
                     
                     <span class="meta">
                          作者 peishen
                         <span>
-                          日期 2017-07-12
+                          日期 2017-08-10
                          </span>
                     </span>
                     <div class="tags text-center">
@@ -164,7 +164,7 @@
     </div>
     <div class="post-title-haojen">
         <span>
-            BlockingQueue原理分析
+            缓存池
         </span>
     </div>
 </header>
@@ -175,28 +175,27 @@
         <div class="row">
             <!-- Post Container -->
             <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
-                <h1 id="1-介绍（作用，特性）"><a href="#1-介绍（作用，特性）" class="headerlink" title="1. 介绍（作用，特性）"></a>1. 介绍（作用，特性）</h1><p>BlockingQueue是阻塞队列，适用于生产者消费者模式，特性是在移除元素和加入元素时，遇到空队列和满队列会做出相应的阻塞操作。</p>
-<h2 id="1-1-移除"><a href="#1-1-移除" class="headerlink" title="1.1 移除"></a>1.1 移除</h2><pre><code>在空队列时，使用移除（take）会先阻塞线程，等待元素添加进来才唤醒移除线程实现移除功能
-</code></pre><h2 id="1-2-加入"><a href="#1-2-加入" class="headerlink" title="1.2 加入"></a>1.2 加入</h2><pre><code>在满队列时，使用加入（put）会先阻塞线程，等待元素移除一个后才唤醒添加线程实现添加功能
-</code></pre><h1 id="2-原理解析"><a href="#2-原理解析" class="headerlink" title="2. 原理解析"></a>2. 原理解析</h1><h2 id="2-1-ReentrantLock：锁以及Condition需要"><a href="#2-1-ReentrantLock：锁以及Condition需要" class="headerlink" title="2.1 ReentrantLock：锁以及Condition需要"></a>2.1 ReentrantLock：锁以及Condition需要</h2><h2 id="2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark"><a href="#2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark" class="headerlink" title="2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)"></a>2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)</h2><pre><code>当移除元素时，会唤醒满队列导致的阻塞线程
-当加入元素时，会唤醒空队列导致的阻塞线程
-</code></pre><h1 id="3-代码解析"><a href="#3-代码解析" class="headerlink" title="3. 代码解析"></a>3. 代码解析</h1><h2 id="3-1-图解："><a href="#3-1-图解：" class="headerlink" title="3.1 图解："></a>3.1 图解：</h2><p><img src="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/12/ArrayBlockingQueue%E8%A7%A3%E6%9E%90%E5%9B%BE.png" alt=""></p>
-<h2 id="3-2-ArrayBlockingQueue源码解析"><a href="#3-2-ArrayBlockingQueue源码解析" class="headerlink" title="3.2 ArrayBlockingQueue源码解析"></a>3.2 ArrayBlockingQueue源码解析</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">ArrayBlockingQueue源码：</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(E e)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        checkNotNull(e);<span class="comment">//检查元素是否为空</span></div><div class="line">        <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">        lock.lockInterruptibly();<span class="comment">//获取锁</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">while</span> (count == items.length)</div><div class="line">                notFull.await();<span class="comment">//当队列已满时，阻塞线程，等待唤醒</span></div><div class="line">            insert(e);<span class="comment">//队列未满，加入元素（并唤醒由notEmpty导致阻塞的线程）</span></div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            lock.unlock();<span class="comment">//释放锁</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line"><span class="function"><span class="keyword">public</span> E <span class="title">take</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">        lock.lockInterruptibly();<span class="comment">//获取锁</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">while</span> (count == <span class="number">0</span>)</div><div class="line">                notEmpty.await();<span class="comment">//空队列时，阻塞线程，等待唤醒</span></div><div class="line">            <span class="keyword">return</span> extract();<span class="comment">//非空队列时，移除元素（并唤醒由notFull导致阻塞的线程）</span></div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            lock.unlock();<span class="comment">//释放锁</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+                <h1 id="1-缓存池介绍"><a href="#1-缓存池介绍" class="headerlink" title="1. 缓存池介绍"></a>1. 缓存池介绍</h1><blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;基本数据类型包装类除了Float和Double之外，其他六个包装类都有常量缓存池，拿Integer来举例子，Integer类内部中内置了 <strong>256个Integer类型数据</strong>，当使用的数据范围在 -128~127之间时，<strong>会直接返回常量池中数据的引用，而不是创建对象</strong>，超过这个范围则会创建对象。</p>
+<h1 id="2-Integer"><a href="#2-Integer" class="headerlink" title="2. Integer"></a>2. Integer</h1><h2 id="2-1-测试代码"><a href="#2-1-测试代码" class="headerlink" title="2.1 测试代码"></a>2.1 测试代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span>  <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span></span>&#123;</div><div class="line">        Integer i1 = <span class="number">40</span>;</div><div class="line">        Integer i2 = <span class="number">40</span>;</div><div class="line">        Integer i3 = <span class="number">0</span>;</div><div class="line">        Integer i4 = <span class="keyword">new</span> Integer(<span class="number">40</span>);</div><div class="line">        Integer i5 = <span class="keyword">new</span> Integer(<span class="number">40</span>);</div><div class="line">        Integer i6 = <span class="keyword">new</span> Integer(<span class="number">0</span>);</div><div class="line">        System.out.println(<span class="string">"i1 == i2,"</span>+(i1==i2));<span class="comment">//40在常量池中，两个引用地址一样，true</span></div><div class="line">        System.out.println(<span class="string">"i1 == (i2+i3),"</span>+(i1 == i2+i3));<span class="comment">//数学运算是在栈中进行，此时比较的是数值，true</span></div><div class="line">        System.out.println(<span class="string">"i1 == i4,"</span>+(i1==i4));<span class="comment">//i4是新建对象的引用，i1是40的引用，两者不一样，false</span></div><div class="line">        System.out.println(<span class="string">"i4 == i5,"</span>+(i4==i5));<span class="comment">//两个新建对象，false</span></div><div class="line">        System.out.println(<span class="string">"i4 == (i5+i6),"</span>+(i4==i5+i6));<span class="comment">//此时比较的是数值，true</span></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="2-2-class字节码"><a href="#2-2-class字节码" class="headerlink" title="2.2 class字节码"></a>2.2 class字节码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        Integer i1 = Integer.valueOf(<span class="number">400</span>);<span class="comment">//声明Integer变量并赋值，其实是调用了valueOf方法</span></div><div class="line">        Integer i2 = Integer.valueOf(<span class="number">400</span>);</div><div class="line">        Integer i3 = Integer.valueOf(<span class="number">0</span>);</div><div class="line">        Integer i4 = <span class="keyword">new</span> Integer(<span class="number">400</span>);</div><div class="line">        Integer i5 = <span class="keyword">new</span> Integer(<span class="number">400</span>);</div><div class="line">        Integer i6 = <span class="keyword">new</span> Integer(<span class="number">0</span>);</div><div class="line">        System.out.println(<span class="string">"i1 == i2,"</span> + (i1 == i2));</div><div class="line">        System.out.println(<span class="string">"i1 == (i2+i3),"</span> + (i1.intValue() == i2.intValue() + i3.intValue()));</div><div class="line">        System.out.println(<span class="string">"i1 == i4,"</span> + (i1 == i4));</div><div class="line">        System.out.println(<span class="string">"i4 == i5,"</span> + (i4 == i5));</div><div class="line">        System.out.println(<span class="string">"i4 == (i5+i6),"</span> + (i4.intValue() == i5.intValue() + i6.intValue()));</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h2 id="2-3-valueOf"><a href="#2-3-valueOf" class="headerlink" title="2.3 valueOf()"></a>2.3 valueOf()</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title">valueOf</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</div><div class="line">        <span class="keyword">assert</span> IntegerCache.high &gt;= <span class="number">127</span>;</div><div class="line">        <span class="keyword">if</span> (i &gt;= IntegerCache.low &amp;&amp; i &lt;= IntegerCache.high)</div><div class="line">        <span class="comment">//在这个范围内的数字则从常量池IntegerCache中获取，返回引用</span></div><div class="line">            <span class="keyword">return</span> IntegerCache.cache[i + (-IntegerCache.low)];</div><div class="line">        <span class="comment">//超过范围则返回新建的对象引用</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Integer(i);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span>  <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span></span>&#123;</div><div class="line">        Integer i1 = <span class="number">400</span>;</div><div class="line">        Integer i2 = <span class="number">400</span>;</div><div class="line">        System.out.println(<span class="string">"i1 == i2,"</span>+(i1==i2));</div><div class="line">        <span class="comment">//400不在常量池中，此时是valueOf方法内的 return  new Integer(i)，返回新建对象</span></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h2 id="2-4-总结"><a href="#2-4-总结" class="headerlink" title="2.4 总结"></a>2.4 总结</h2><blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;由上面的代码可得知，用Integer来声明变量时，会调用其内部的<font color="red">valueOf()方法</font>，而此时valueOf()内部是会判断赋值的数值是否在Integer的<font color="red">IntegerCache（内部类）的cache</font>中，假若有则直接返回IntegerCache中对应cache的引用即可，否则要创建Integer对象，并返回引用。</p>
+</blockquote>
+<h1 id="3-其他包装类"><a href="#3-其他包装类" class="headerlink" title="3. 其他包装类"></a>3. 其他包装类</h1><p><img src="https://github.com/hedaoming/peishen.github.io/raw/a1035071d3ac8ee710de61ca2d1f06ff5ce64193/2017/08/09/%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BB%E7%BC%93%E5%AD%98%E6%B1%A0.png" alt=""></p>
 
                 <hr>
                 
 
                 <ul class="pager">
                     
-                    <li class="previous">
-                        <a href="/2017/07/23/springMVC拦截器分析/" data-toggle="tooltip" data-placement="top"
-                           title="SpringMVC拦截器分析">&larr; Previous Post</a>
-                    </li>
-                    
                     
                     <li class="next">
-                        <a href="/2017/07/03/幸福课第一节/" data-toggle="tooltip" data-placement="top"
-                           title="辛福课第一节">Next Post &rarr;</a>
+                        <a href="/2017/08/09/线程池介绍/" data-toggle="tooltip" data-placement="top"
+                           title="线程池介绍">Next Post &rarr;</a>
                     </li>
                     
                 </ul>
@@ -231,7 +230,7 @@
 
             <div class="hidden-xs col-sm-3 toc-col">
                 <div class="toc-wrap">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-介绍（作用，特性）"><span class="toc-text">1. 介绍（作用，特性）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-移除"><span class="toc-text">1.1 移除</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-加入"><span class="toc-text">1.2 加入</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-原理解析"><span class="toc-text">2. 原理解析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-ReentrantLock：锁以及Condition需要"><span class="toc-text">2.1 ReentrantLock：锁以及Condition需要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark"><span class="toc-text">2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-代码解析"><span class="toc-text">3. 代码解析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-图解："><span class="toc-text">3.1 图解：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-ArrayBlockingQueue源码解析"><span class="toc-text">3.2 ArrayBlockingQueue源码解析</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-缓存池介绍"><span class="toc-text">1. 缓存池介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-Integer"><span class="toc-text">2. Integer</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-测试代码"><span class="toc-text">2.1 测试代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-class字节码"><span class="toc-text">2.2 class字节码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-valueOf"><span class="toc-text">2.3 valueOf()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-总结"><span class="toc-text">2.4 总结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-其他包装类"><span class="toc-text">3. 其他包装类</span></a></li></ol>
                 </div>
             </div>
         </div>
