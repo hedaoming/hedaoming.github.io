@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.css">
     <title>
         
-        HashMap源码分析｜peishen&#39;s blog
+        HTTPS介绍｜peishen&#39;s blog
         
     </title>
 
-    <link rel="canonical" href="http://yoursite.com/2017/06/25/HashMap源码分析/">
+    <link rel="canonical" href="http://yoursite.com/2017/08/18/HTTPS介绍/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -145,12 +145,12 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
                 <div class="post-heading">
-                    <h1>HashMap源码分析</h1>
+                    <h1>HTTPS介绍</h1>
                     
                     <span class="meta">
                          作者 peishen
                         <span>
-                          日期 2017-06-25
+                          日期 2017-08-18
                          </span>
                     </span>
                     <div class="tags text-center">
@@ -162,7 +162,7 @@
     </div>
     <div class="post-title-haojen">
         <span>
-            HashMap源码分析
+            HTTPS介绍
         </span>
     </div>
 </header>
@@ -173,17 +173,68 @@
         <div class="row">
             <!-- Post Container -->
             <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
-                
+                <h1 id="1-HTTPS"><a href="#1-HTTPS" class="headerlink" title="1. HTTPS"></a>1. HTTPS</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;HTTPS也称作是HTTP over TLS，是在HTTP协议的基础上加上了SSL/TLS协议，保证了数据传输过程的安全性，数据加密后再进行传输，即使被窃取了，没有密钥也是还原不出内容，被广泛应用于安全性需求高的网站，比如支付、购物等网站。</p>
+<h2 id="1-1-作用"><a href="#1-1-作用" class="headerlink" title="1.1 作用"></a>1.1 作用</h2><ul>
+<li>数据完整性<blockquote>
+<p>使用HTTP时，网页的传输的内容是明文的，很容易就被篡改内容，例如ISP会植入一些广告等，而使用HTTPS则不会，因为传输的内容是密文，即使别人拿到了，也无法恢复原有内容，就无法篡改其内容了。 </p>
+</blockquote>
+</li>
+<li><p>认证</p>
+<blockquote>
+<p>验证客户端以及服务端，保证数据发送到想要的地方</p>
+</blockquote>
+</li>
+<li><p>加密</p>
+<blockquote>
+<p>对传输的内容进行加密，防止被窃取信息</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="1-2-HTTP-1-0-与-HTTP-1-1"><a href="#1-2-HTTP-1-0-与-HTTP-1-1" class="headerlink" title="1.2 HTTP 1.0 与 HTTP 1.1"></a>1.2 HTTP 1.0 与 HTTP 1.1</h2><h3 id="长连接和短连接"><a href="#长连接和短连接" class="headerlink" title="长连接和短连接"></a>长连接和短连接</h3><blockquote>
+<ol>
+<li>短连接：不会保持长久的连接，比如请求一个页面时，<br>①&nbsp;&nbsp;先发起一个TCP连接，接着获取到页面的HTML代码，此时就将连接断开.<br>②&nbsp;&nbsp;解析HTML代码，发现静态资源（css，图片），在依次对资源进行一次次的TCP连接，获取资源</li>
+<li>长连接：keep-alive，维持一个较长的连接，比如请求一个页面时，<br>①&nbsp;&nbsp;发起一个TCP连接，获取到HTML代码，连接继续保持着<br>②&nbsp;&nbsp;解析HTML代码，发现静态资源，利用已存在的连接，继续去获取资源</li>
+<li>在HTTP 1.0 中默认使用的是短连接，而在HTTP 1.1 中则是默认使用长连接</li>
+</ol>
+</blockquote>
+<h1 id="2-SSL-TLS"><a href="#2-SSL-TLS" class="headerlink" title="2. SSL/TLS"></a>2. SSL/TLS</h1><blockquote>
+<p>SSL(Secure Sockets Layer),安全套接层<br>  TLS(Transport Layer Security),标准化后的SSL协议,所以SSL和TSL是同一个东西的不同阶段。</p>
+</blockquote>
+<h2 id="2-1-作用"><a href="#2-1-作用" class="headerlink" title="2.1 作用"></a>2.1 作用</h2><p>&nbsp;&nbsp;&nbsp;&nbsp;SSL/TLS在网络模型中是处于应用层和传输层协议（TCP）之间，主要是<strong>利用来生成客户端和服务端之间的“对话密钥”</strong>，保证传输的安全性，而<strong>实际传输还是通过HTTP协议</strong>，只不过在HTTP协议基础上，传输的内容是通过“对话密钥”加密过的密文，这样做的原因是非对称加密很耗费资源和时间，要是每个连接都是用SSL/TLS的形式进行加密传输，会影响响应时间，而利用“对话密钥”的对称加密则能解决资源占用的问题，所以实际上<strong>HTTPS = HTTP（负责传输）　＋　SSL/TLS（负责制造“对话密钥”）</strong></p>
+<h2 id="2-2-流程"><a href="#2-2-流程" class="headerlink" title="2.2 流程"></a>2.2 流程</h2><p><img src="https://github.com/hedaoming/peishen.github.io/raw/d4d2ae03d57251f4f0aeec27173504fc778e82d5/2017/08/18/SSL%EF%BC%8CTLS%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt=""></p>
+<h1 id="3-HTTPS和HTTP的区别"><a href="#3-HTTPS和HTTP的区别" class="headerlink" title="3. HTTPS和HTTP的区别"></a>3. HTTPS和HTTP的区别</h1><table>
+<thead>
+<tr>
+<th>HTTPS</th>
+<th>HTTP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>加密过的安全协议：传输的是密文</td>
+<td>没有加密的协议：传输的是明文</td>
+</tr>
+<tr>
+<td>HTTPS = HTTP + SSL/TLS</td>
+<td>单纯HTTP</td>
+</tr>
+<tr>
+<td>数据完整不会被篡改　</td>
+<td>　数据明文，容易被篡改</td>
+</tr>
+</tbody>
+</table>
+
                 <hr>
                 
 
                 <ul class="pager">
                     
-                    <li class="previous">
-                        <a href="/2017/06/26/git使用/" data-toggle="tooltip" data-placement="top"
-                           title="git的基本使用">&larr; Previous Post</a>
-                    </li>
                     
+                    <li class="next">
+                        <a href="/2017/08/11/ConcurrentHashMap分析/" data-toggle="tooltip" data-placement="top"
+                           title="ConcurrentHashMap分析">Next Post &rarr;</a>
+                    </li>
                     
                 </ul>
 
@@ -217,7 +268,7 @@
 
             <div class="hidden-xs col-sm-3 toc-col">
                 <div class="toc-wrap">
-                    
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-HTTPS"><span class="toc-text">1. HTTPS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-作用"><span class="toc-text">1.1 作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-HTTP-1-0-与-HTTP-1-1"><span class="toc-text">1.2 HTTP 1.0 与 HTTP 1.1</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#长连接和短连接"><span class="toc-text">长连接和短连接</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-SSL-TLS"><span class="toc-text">2. SSL/TLS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-作用"><span class="toc-text">2.1 作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-流程"><span class="toc-text">2.2 流程</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-HTTPS和HTTP的区别"><span class="toc-text">3. HTTPS和HTTP的区别</span></a></li></ol>
                 </div>
             </div>
         </div>
