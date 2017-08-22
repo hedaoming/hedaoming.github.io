@@ -273,6 +273,29 @@
 
 <div class="post-preview "
      style="background-image: url('')">
+    <a href="/2017/08/22/NIO浅析/">
+        <h2 class="post-title">
+            NIO浅析
+        </h2>
+        <p class="post-meta">
+            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-08-22
+        </p>
+        
+        <div class="post-content-preview">
+            <p>
+                1. NIO&nbsp;&nbsp;&nbsp;&nbsp;NIO是Non-blocking IO，与传统IO的区别是不会阻塞线程，在多线程中，利用传统IO处理时，遇到网络延迟较高的场景时，阻塞线程的情况比较严重，那么对线程造成的资源浪费线程就比较多了，此时若是利用NIO的话，则能避免这种情况，..
+            </p>
+        </div>
+    </a>
+
+</div>
+
+<hr>
+
+
+
+<div class="post-preview "
+     style="background-image: url('')">
     <a href="/2017/08/18/HTTPS介绍/">
         <h2 class="post-title">
             HTTPS介绍
@@ -469,29 +492,6 @@ ThreadLocal提供了线程局部变量，每个线程都有各自独立的局部
 
 <div class="post-preview "
      style="background-image: url('')">
-    <a href="/2017/07/23/springMVC拦截器分析/">
-        <h2 class="post-title">
-            SpringMVC拦截器分析
-        </h2>
-        <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-23
-        </p>
-        
-        <div class="post-content-preview">
-            <p>
-                1. 拦截器作用介绍&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;拦截器是在不改变业务代码的前提下，编织入自定义的功能，比如在登录页面中，检验登录的业务代码是不可变的，而此时要加入一些前置验证例如是否用户已登录等，此时就通过拦截器来实现，而不需要修改核心业务代码，可分离..
-            </p>
-        </div>
-    </a>
-
-</div>
-
-<hr>
-
-
-
-<div class="post-preview "
-     style="background-image: url('')">
     <a href="/2017/07/23/个别案例的不可靠性/">
         <h2 class="post-title">
             个别案例的不可靠性
@@ -520,23 +520,17 @@ ThreadLocal提供了线程局部变量，每个线程都有各自独立的局部
 
 <div class="post-preview "
      style="background-image: url('')">
-    <a href="/2017/07/12/BlockingQueue分析/">
+    <a href="/2017/07/23/springMVC拦截器分析/">
         <h2 class="post-title">
-            BlockingQueue原理分析
+            SpringMVC拦截器分析
         </h2>
         <p class="post-meta">
-            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-12
+            <i class="fa fa-calendar" aria-hidden="true"></i> 2017-07-23
         </p>
-        
-        <h3 class="post-subtitle">
-            用到了Condition和ReentrantLock
-        </h3>
         
         <div class="post-content-preview">
             <p>
-                1. 介绍（作用，特性）BlockingQueue是阻塞队列，适用于生产者消费者模式，特性是在移除元素和加入元素时，遇到空队列和满队列会做出相应的阻塞操作。
-1.1 移除在空队列时，使用移除（take）会先阻塞线程，等待元素添加进来才唤醒移除线程实现移除功能
-1.2 加入在满队列时，使用加入（p..
+                1. 拦截器作用介绍&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;拦截器是在不改变业务代码的前提下，编织入自定义的功能，比如在登录页面中，检验登录的业务代码是不可变的，而此时要加入一些前置验证例如是否用户已登录等，此时就通过拦截器来实现，而不需要修改核心业务代码，可分离..
             </p>
         </div>
     </a>
