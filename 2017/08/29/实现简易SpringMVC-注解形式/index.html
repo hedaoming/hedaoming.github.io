@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.css">
     <title>
         
-        BlockingQueue原理分析｜peishen&#39;s blog
+        实现简易SpringMVC（注解形式）｜peishen&#39;s blog
         
     </title>
 
-    <link rel="canonical" href="http://yoursite.com/2017/07/12/BlockingQueue分析/">
+    <link rel="canonical" href="http://yoursite.com/2017/08/29/实现简易SpringMVC-注解形式/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -145,14 +145,12 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
                 <div class="post-heading">
-                    <h1>BlockingQueue原理分析</h1>
-                    
-                    <h2 class="subheading">用到了Condition和ReentrantLock</h2>
+                    <h1>实现简易SpringMVC（注解形式）</h1>
                     
                     <span class="meta">
                          作者 peishen
                         <span>
-                          日期 2017-07-12
+                          日期 2017-08-29
                          </span>
                     </span>
                     <div class="tags text-center">
@@ -164,7 +162,7 @@
     </div>
     <div class="post-title-haojen">
         <span>
-            BlockingQueue原理分析
+            实现简易SpringMVC（注解形式）
         </span>
     </div>
 </header>
@@ -175,28 +173,30 @@
         <div class="row">
             <!-- Post Container -->
             <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
-                <h1 id="1-介绍（作用，特性）"><a href="#1-介绍（作用，特性）" class="headerlink" title="1. 介绍（作用，特性）"></a>1. 介绍（作用，特性）</h1><p>BlockingQueue是阻塞队列，适用于生产者消费者模式，特性是在移除元素和加入元素时，遇到空队列和满队列会做出相应的阻塞操作。</p>
-<h2 id="1-1-移除"><a href="#1-1-移除" class="headerlink" title="1.1 移除"></a>1.1 移除</h2><pre><code>在空队列时，使用移除（take）会先阻塞线程，等待元素添加进来才唤醒移除线程实现移除功能
-</code></pre><h2 id="1-2-加入"><a href="#1-2-加入" class="headerlink" title="1.2 加入"></a>1.2 加入</h2><pre><code>在满队列时，使用加入（put）会先阻塞线程，等待元素移除一个后才唤醒添加线程实现添加功能
-</code></pre><h1 id="2-原理解析"><a href="#2-原理解析" class="headerlink" title="2. 原理解析"></a>2. 原理解析</h1><h2 id="2-1-ReentrantLock：锁以及Condition需要"><a href="#2-1-ReentrantLock：锁以及Condition需要" class="headerlink" title="2.1 ReentrantLock：锁以及Condition需要"></a>2.1 ReentrantLock：锁以及Condition需要</h2><h2 id="2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark"><a href="#2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark" class="headerlink" title="2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)"></a>2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)</h2><pre><code>当移除元素时，会唤醒满队列导致的阻塞线程
-当加入元素时，会唤醒空队列导致的阻塞线程
-</code></pre><h1 id="3-代码解析"><a href="#3-代码解析" class="headerlink" title="3. 代码解析"></a>3. 代码解析</h1><h2 id="3-1-图解："><a href="#3-1-图解：" class="headerlink" title="3.1 图解："></a>3.1 图解：</h2><p><img src="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/12/ArrayBlockingQueue%E8%A7%A3%E6%9E%90%E5%9B%BE.png" alt=""></p>
-<h2 id="3-2-ArrayBlockingQueue源码解析"><a href="#3-2-ArrayBlockingQueue源码解析" class="headerlink" title="3.2 ArrayBlockingQueue源码解析"></a>3.2 ArrayBlockingQueue源码解析</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">ArrayBlockingQueue源码：</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(E e)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        checkNotNull(e);<span class="comment">//检查元素是否为空</span></div><div class="line">        <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">        lock.lockInterruptibly();<span class="comment">//获取锁</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">while</span> (count == items.length)</div><div class="line">                notFull.await();<span class="comment">//当队列已满时，阻塞线程，等待唤醒</span></div><div class="line">            insert(e);<span class="comment">//队列未满，加入元素（并唤醒由notEmpty导致阻塞的线程）</span></div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            lock.unlock();<span class="comment">//释放锁</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line"><span class="function"><span class="keyword">public</span> E <span class="title">take</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</div><div class="line">        lock.lockInterruptibly();<span class="comment">//获取锁</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">while</span> (count == <span class="number">0</span>)</div><div class="line">                notEmpty.await();<span class="comment">//空队列时，阻塞线程，等待唤醒</span></div><div class="line">            <span class="keyword">return</span> extract();<span class="comment">//非空队列时，移除元素（并唤醒由notFull导致阻塞的线程）</span></div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            lock.unlock();<span class="comment">//释放锁</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+                <h1 id="1-SpringMVC流程介绍"><a href="#1-SpringMVC流程介绍" class="headerlink" title="1.  SpringMVC流程介绍"></a>1.  SpringMVC流程介绍</h1><p><img src="https://github.com/hedaoming/peishen.github.io/raw/e8db24a2ccb65bc8afbe1c9cc2453b63bcc246cc/2017/08/29/SpringMVC%E8%A7%A3%E6%9E%90%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt=""></p>
+<blockquote>
+<p>①HandlerMapping：负责映射request和Handler，返回HandlerExecutionChain执行链，包含了拦截器和处理请求的Handler。<br>②HandlerAdapter：通过执行链，调用对应的HandlerAdapter去执行Handler，返回ModelAndView。<br>③View：解析成一个view视图，返回给DispatcherServlet</p>
+</blockquote>
+<h1 id="2-自定义注解"><a href="#2-自定义注解" class="headerlink" title="2.  自定义注解"></a>2.  自定义注解</h1><h2 id="2-1-注解的好处"><a href="#2-1-注解的好处" class="headerlink" title="2.1 注解的好处"></a>2.1 注解的好处</h2><p>注解能保存类需要的一些信息，并存活于源代码、编译器、运行期，比如在Hibernate中，想实现ORM就得指定实体类和数据表之间的关系，而这层关系可以用xml来表示，当用xml来维护这层关系时，就是将实体类所需要的信息存储在xml中，此时也可以通过注解来实现，将信息维护在实体类中，这样一个类就能不依赖外部文件来使用了。</p>
+<h2 id="2-2-元注解"><a href="#2-2-元注解" class="headerlink" title="2.2 元注解"></a>2.2 元注解</h2><p>@Target：指定注解作用的范围，如作用于类，方法，属性<br>@Documented：成为公共API<br>@Retention：存活的生命期，如源代码、编译器、运行期<br>@Inherited：注解继承</p>
+<h2 id="2-3-使用注解"><a href="#2-3-使用注解" class="headerlink" title="2.3 使用注解"></a>2.3 使用注解</h2><p>自定义四个注解，分别是<br>@Controller：指定Controller类<br>@Service：加入IoC容器中<br>@Autowired：从IoC容器中获取对象<br>@RequestMapping：请求对应的处理方法</p>
+<h1 id="3-实现流程"><a href="#3-实现流程" class="headerlink" title="3.  实现流程"></a>3.  实现流程</h1><p>实现SpringMVC功能的主要函数是DispatcherServlet，实现流程如下</p>
+<h2 id="3-1-扫描当前项目下的所有文件"><a href="#3-1-扫描当前项目下的所有文件" class="headerlink" title="3.1 扫描当前项目下的所有文件"></a>3.1 扫描当前项目下的所有文件</h2><p>流程：将项目中的文件遍历出来，包括包和类文件，并将文件路径加入pathNames中，如 zhku.mvc.controller.MsgController转换成zhku/mvc/controller/MsgController<br><strong>目的：文件路径是反射时需要</strong></p>
+<h2 id="3-2-通过反射实例化对象"><a href="#3-2-通过反射实例化对象" class="headerlink" title="3.2 通过反射实例化对象"></a>3.2 通过反射实例化对象</h2><p>操作：实例化Controller类和Service类，并加入instanceMap中<br><strong>目的：封装映射关系时和为@Service注入对象需要</strong></p>
+<h2 id="3-3-封装request和method的映射关系"><a href="#3-3-封装request和method的映射关系" class="headerlink" title="3.3 封装request和method的映射关系"></a>3.3 封装request和method的映射关系</h2><p>操作：取出instanceMap中的Controller对象，并获取其内的RequestMapping注解的值value，这就是匹配的request，将这个value和method对象加入handlerMap中<br><strong>目的：request请求匹配相关操作方法时需要</strong></p>
+<h2 id="3-4-IoC：为使用-Service注解的属性注入对象"><a href="#3-4-IoC：为使用-Service注解的属性注入对象" class="headerlink" title="3.4 IoC：为使用@Service注解的属性注入对象"></a>3.4 IoC：为使用@Service注解的属性注入对象</h2><p>操作：遍历instanceMap，找到所有Field，注解为@Autowired的Field则获取其注解value，通过value到instanceMap中获取对象，并注入到这个Field中，实现注入对象功能。<br><strong>目的：注入对象</strong></p>
+<h2 id="3-5-doPost-处理请求，匹配对应的method"><a href="#3-5-doPost-处理请求，匹配对应的method" class="headerlink" title="3.5 doPost():处理请求，匹配对应的method"></a>3.5 doPost():处理请求，匹配对应的method</h2><p>操作：获取实际请求路径，并从handlerMap中匹配对应的method对象，获取method之后通过反射调用方法即可。<br><strong>目的：处理请求</strong></p>
+<h1 id="4-实现代码"><a href="#4-实现代码" class="headerlink" title="4. 实现代码"></a>4. 实现代码</h1><p>github地址：<a href="https://github.com/hedaoming/LarveMVC" target="_blank" rel="external">https://github.com/hedaoming/LarveMVC</a></p>
 
                 <hr>
                 
 
                 <ul class="pager">
                     
-                    <li class="previous">
-                        <a href="/2017/07/23/springMVC拦截器分析/" data-toggle="tooltip" data-placement="top"
-                           title="SpringMVC拦截器分析">&larr; Previous Post</a>
-                    </li>
-                    
                     
                     <li class="next">
-                        <a href="/2017/07/03/幸福课第一节/" data-toggle="tooltip" data-placement="top"
-                           title="辛福课第一节">Next Post &rarr;</a>
+                        <a href="/2017/08/22/NIO浅析/" data-toggle="tooltip" data-placement="top"
+                           title="NIO浅析">Next Post &rarr;</a>
                     </li>
                     
                 </ul>
@@ -231,7 +231,7 @@
 
             <div class="hidden-xs col-sm-3 toc-col">
                 <div class="toc-wrap">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-介绍（作用，特性）"><span class="toc-text">1. 介绍（作用，特性）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-移除"><span class="toc-text">1.1 移除</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-加入"><span class="toc-text">1.2 加入</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-原理解析"><span class="toc-text">2. 原理解析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-ReentrantLock：锁以及Condition需要"><span class="toc-text">2.1 ReentrantLock：锁以及Condition需要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-Condition：阻塞和唤醒线程-利用了LockSupport-park-unpark"><span class="toc-text">2.2 Condition：阻塞和唤醒线程(利用了LockSupport.park,unpark)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-代码解析"><span class="toc-text">3. 代码解析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-图解："><span class="toc-text">3.1 图解：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-ArrayBlockingQueue源码解析"><span class="toc-text">3.2 ArrayBlockingQueue源码解析</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-SpringMVC流程介绍"><span class="toc-text">1.  SpringMVC流程介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-自定义注解"><span class="toc-text">2.  自定义注解</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-注解的好处"><span class="toc-text">2.1 注解的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-元注解"><span class="toc-text">2.2 元注解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-使用注解"><span class="toc-text">2.3 使用注解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-实现流程"><span class="toc-text">3.  实现流程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-扫描当前项目下的所有文件"><span class="toc-text">3.1 扫描当前项目下的所有文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-通过反射实例化对象"><span class="toc-text">3.2 通过反射实例化对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-封装request和method的映射关系"><span class="toc-text">3.3 封装request和method的映射关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-IoC：为使用-Service注解的属性注入对象"><span class="toc-text">3.4 IoC：为使用@Service注解的属性注入对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-doPost-处理请求，匹配对应的method"><span class="toc-text">3.5 doPost():处理请求，匹配对应的method</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-实现代码"><span class="toc-text">4. 实现代码</span></a></li></ol>
                 </div>
             </div>
         </div>
