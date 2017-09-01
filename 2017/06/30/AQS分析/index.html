@@ -5,14 +5,14 @@
   
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <link rel="dns-prefetch" href="http://yoursite.com">
+  <link rel="dns-prefetch" href="http://118.89.22.123">
   <title>AbstractQueuedSynchronizer源码分析 | peishen&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的tryAcquire和tryRelease方法的，所以了解AQS的原理以及结构有助于了解其他并发类。">
 <meta name="keywords" content="java并发">
 <meta property="og:type" content="article">
 <meta property="og:title" content="AbstractQueuedSynchronizer源码分析">
-<meta property="og:url" content="http://yoursite.com/2017/06/30/AQS分析/index.html">
+<meta property="og:url" content="http://118.89.22.123/2017/06/30/AQS分析/index.html">
 <meta property="og:site_name" content="peishen&#39;s blog">
 <meta property="og:description" content="1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的tryAcquire和tryRelease方法的，所以了解AQS的原理以及结构有助于了解其他并发类。">
 <meta property="og:image" content="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/5/AQS%E7%BB%93%E6%9E%84.png">
@@ -278,7 +278,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/06/30/AQS分析/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://118.89.22.123/2017/06/30/AQS分析/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -458,6 +458,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">IO</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">HTTPS</a>
               </li>
              
@@ -467,14 +475,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">TLS</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">IO</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -522,11 +522,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">CountDownLatch</a>
+                <a href="javascript:void(0)" class="js-tag color5">实现原理</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">实现原理</a>
+                <a href="javascript:void(0)" class="js-tag color5">CountDownLatch</a>
               </li>
              
               <li class="article-tag-list-item">

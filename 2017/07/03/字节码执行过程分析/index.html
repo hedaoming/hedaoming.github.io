@@ -5,14 +5,14 @@
   
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <link rel="dns-prefetch" href="http://yoursite.com">
+  <link rel="dns-prefetch" href="http://118.89.22.123">
   <title>字节码执行过程分析 | peishen&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="0. 引言这篇文章主要是分析了for语句以及普通变量之间在编译后是如何执行的，其中围绕着一个重点，就是变量赋值、运算都是依赖于局部变量表和操作数栈这两个重要的概念的，而局部变量表和操作数栈都位于jvm中的栈中。通过简单分析字节码执行过程，得知了static变量是会自动加入static代码块中加以赋值的，而全局变量和常量则是在构造函数中赋值的，也就是实例化后才能赋值。">
 <meta name="keywords" content="java字节码">
 <meta property="og:type" content="article">
 <meta property="og:title" content="字节码执行过程分析">
-<meta property="og:url" content="http://yoursite.com/2017/07/03/字节码执行过程分析/index.html">
+<meta property="og:url" content="http://118.89.22.123/2017/07/03/字节码执行过程分析/index.html">
 <meta property="og:site_name" content="peishen&#39;s blog">
 <meta property="og:description" content="0. 引言这篇文章主要是分析了for语句以及普通变量之间在编译后是如何执行的，其中围绕着一个重点，就是变量赋值、运算都是依赖于局部变量表和操作数栈这两个重要的概念的，而局部变量表和操作数栈都位于jvm中的栈中。通过简单分析字节码执行过程，得知了static变量是会自动加入static代码块中加以赋值的，而全局变量和常量则是在构造函数中赋值的，也就是实例化后才能赋值。">
 <meta property="og:image" content="https://github.com/hedaoming/peishen.github.io/raw/master/imgs/2017/6/%E6%A0%88%E5%B8%A7.png">
@@ -272,7 +272,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/07/03/字节码执行过程分析/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://118.89.22.123/2017/07/03/字节码执行过程分析/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -452,6 +452,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">IO</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">HTTPS</a>
               </li>
              
@@ -461,14 +469,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">TLS</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">IO</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -516,11 +516,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">CountDownLatch</a>
+                <a href="javascript:void(0)" class="js-tag color5">实现原理</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">实现原理</a>
+                <a href="javascript:void(0)" class="js-tag color5">CountDownLatch</a>
               </li>
              
               <li class="article-tag-list-item">
