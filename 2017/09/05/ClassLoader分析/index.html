@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="http://118.89.22.123">
   <title>ClassLoader分析 | peishen&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1. ClassLoader介绍 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ClassLoader是将字节码加载进JVM内存中的类，同时将解析并初始化类，sun默认提供的有三个ClassLoader。  2. 双亲委托机制原因 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;正确加载程序和JVM所需要的类，比如String类是由Bootstrap ClassLoader加载的，要是没有双亲委">
+  <meta name="description" content="1. ClassLoader介绍 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ClassLoader是将字节码加载进JVM内存中的类，同时将解析并初始化类，sun默认提供的有三个ClassLoader。">
 <meta name="keywords" content="JVM,ClassLoader">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ClassLoader分析">
 <meta property="og:url" content="http://118.89.22.123/2017/09/05/ClassLoader分析/index.html">
 <meta property="og:site_name" content="peishen&#39;s blog">
-<meta property="og:description" content="1. ClassLoader介绍 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ClassLoader是将字节码加载进JVM内存中的类，同时将解析并初始化类，sun默认提供的有三个ClassLoader。  2. 双亲委托机制原因 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;正确加载程序和JVM所需要的类，比如String类是由Bootstrap ClassLoader加载的，要是没有双亲委">
-<meta property="og:updated_time" content="2017-09-05T08:06:29.229Z">
+<meta property="og:description" content="1. ClassLoader介绍 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ClassLoader是将字节码加载进JVM内存中的类，同时将解析并初始化类，sun默认提供的有三个ClassLoader。">
+<meta property="og:updated_time" content="2017-09-05T08:13:18.688Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ClassLoader分析">
-<meta name="twitter:description" content="1. ClassLoader介绍 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ClassLoader是将字节码加载进JVM内存中的类，同时将解析并初始化类，sun默认提供的有三个ClassLoader。  2. 双亲委托机制原因 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;正确加载程序和JVM所需要的类，比如String类是由Bootstrap ClassLoader加载的，要是没有双亲委">
+<meta name="twitter:description" content="1. ClassLoader介绍 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ClassLoader是将字节码加载进JVM内存中的类，同时将解析并初始化类，sun默认提供的有三个ClassLoader。">
   
     <link rel="alternative" href="/atom.xml" title="peishen&#39;s blog" type="application/atom+xml">
   
@@ -177,6 +177,7 @@
         <h2 id="1-ClassLoader介绍"><a href="#1-ClassLoader介绍" class="headerlink" title="1. ClassLoader介绍"></a>1. ClassLoader介绍</h2><blockquote>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;ClassLoader是将字节码加载进JVM内存中的类，同时将解析并初始化类，sun默认提供的有三个ClassLoader。</p>
 </blockquote>
+<a id="more"></a>
 <h2 id="2-双亲委托机制原因"><a href="#2-双亲委托机制原因" class="headerlink" title="2. 双亲委托机制原因"></a>2. 双亲委托机制原因</h2><blockquote>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;正确加载程序和JVM所需要的类，比如String类是由Bootstrap ClassLoader加载的，要是没有双亲委托机制，而我自己又编写了一个String类，那么将会加载我的String进入JVM中，此时其他依赖的类用到了系统的String类的话，就可能会出现错误，有两个String类被加载进了JVM中，可能会导致无法运行成功，双亲委托就是保证这种情况不会发生。</p>
 </blockquote>
@@ -470,6 +471,18 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">HTTPS</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">网络协议</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">TLS</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">NIO</a>
               </li>
              
@@ -486,15 +499,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">HTTPS</a>
+                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">网络协议</a>
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">TLS</a>
+                <a href="javascript:void(0)" class="js-tag color4">拦截器</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -510,18 +523,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">拦截器</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">心理学</a>
               </li>
              
@@ -530,15 +531,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">实现原理</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">java字节码</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">CountDownLatch</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">实现原理</a>
               </li>
              
               <li class="article-tag-list-item">

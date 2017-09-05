@@ -178,37 +178,9 @@
         <h2 id="1-ClassLoader介绍"><a href="#1-ClassLoader介绍" class="headerlink" title="1. ClassLoader介绍"></a>1. ClassLoader介绍</h2><blockquote>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;ClassLoader是将字节码加载进JVM内存中的类，同时将解析并初始化类，sun默认提供的有三个ClassLoader。</p>
 </blockquote>
-<h2 id="2-双亲委托机制原因"><a href="#2-双亲委托机制原因" class="headerlink" title="2. 双亲委托机制原因"></a>2. 双亲委托机制原因</h2><blockquote>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;正确加载程序和JVM所需要的类，比如String类是由Bootstrap ClassLoader加载的，要是没有双亲委托机制，而我自己又编写了一个String类，那么将会加载我的String进入JVM中，此时其他依赖的类用到了系统的String类的话，就可能会出现错误，有两个String类被加载进了JVM中，可能会导致无法运行成功，双亲委托就是保证这种情况不会发生。</p>
-</blockquote>
-<h2 id="3-三个ClassLoader"><a href="#3-三个ClassLoader" class="headerlink" title="3. 三个ClassLoader"></a>3. 三个ClassLoader</h2><ol>
-<li><p>Bootstrap ClassLoader</p>
-<blockquote>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;不继承自ClassLoader，由C++实现，随JVM启动而加载，会构造出ExtClassLoader和AppClassLoader；加载rt.jar包中的class</p>
-</blockquote>
-</li>
-<li><p>ExtClassLoader</p>
-<blockquote>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;父类是Bootstrap ClassLoader，但因为Bootstrap是c++编写的，所以在java中用null表示ExtClassLoader的父类加载器;加载ext文件夹中的class</p>
-</blockquote>
-</li>
-<li><p>AppClassLoader</p>
-<blockquote>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;父类是ExtClassLoader，加载用户所编写的Class</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="4-类加载动态性"><a href="#4-类加载动态性" class="headerlink" title="4. 类加载动态性"></a>4. 类加载动态性</h2><p>JVM启动时，将所需要的基础类都加载到内存中来（Bootstrap），而其他类只在需要时才加载，这样能节省内存开销</p>
-<h2 id="5-context-class-loader（基础类中回调用户代码）"><a href="#5-context-class-loader（基础类中回调用户代码）" class="headerlink" title="5. context class loader（基础类中回调用户代码）"></a>5. context class loader（基础类中回调用户代码）</h2><blockquote>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;线程上下文类加载器：绕过双亲委托模式，指定类加载器。比如JDBC接口是由java核心库提供，而我们使用时是利用其实现类，此时因为实现类不属于java核心库，而JDBC接口里的代码经常需要加载具体的实现类，实现类是由AppClassLoader加载，则会出现问题。context class  loader默认是AppClassLoader，使用其则能让SPI接口的代码（如JDBC接口的代码）使用context class loader，从而成功加载到SPI实现的类。</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">protected</span> Class&lt;?&gt; loadClass(String name, <span class="keyword">boolean</span> resolve)</div><div class="line">        <span class="keyword">throws</span> ClassNotFoundException</div><div class="line">    &#123;</div><div class="line">        <span class="keyword">synchronized</span> (getClassLoadingLock(name)) &#123;</div><div class="line">            <span class="comment">// First, check if the class has already been loaded</span></div><div class="line">            <span class="comment">//1. 查看类是否已经加载进来了</span></div><div class="line">            Class c = findLoadedClass(name);</div><div class="line">            <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</div><div class="line">                <span class="keyword">long</span> t0 = System.nanoTime();</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    <span class="comment">//2. 类未被加载：委托父类加载</span></div><div class="line">                    <span class="comment">//2.1 是否有父加载器：双亲委派模式</span></div><div class="line">                    <span class="keyword">if</span> (parent != <span class="keyword">null</span>) &#123;</div><div class="line">                        <span class="comment">//2.1.1 有父类，让父类加载该类</span></div><div class="line">                        c = parent.loadClass(name, <span class="keyword">false</span>);</div><div class="line">                    &#125; <span class="keyword">else</span> &#123;</div><div class="line">                        <span class="comment">//2.1.2 没有父类，让Bootstrap加载该类</span></div><div class="line">                        c = findBootstrapClassOrNull(name);</div><div class="line">                    &#125;</div><div class="line">                &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</div><div class="line">                    <span class="comment">// ClassNotFoundException thrown if class not found</span></div><div class="line">                    <span class="comment">// from the non-null parent class loader</span></div><div class="line">                &#125;</div><div class="line">                <span class="comment">//3. 类未被加载：使用自定义类加载器加载</span></div><div class="line">                <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</div><div class="line">                    <span class="comment">// If still not found, then invoke findClass in order</span></div><div class="line">                    <span class="comment">// to find the class.</span></div><div class="line">                    <span class="keyword">long</span> t1 = System.nanoTime();</div><div class="line">                    <span class="comment">//3.1 自定义类加载器的加载方法</span></div><div class="line">                    c = findClass(name);</div><div class="line"></div><div class="line">                    <span class="comment">// this is the defining class loader; record the stats</span></div><div class="line">                    sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);</div><div class="line">                    sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</div><div class="line">                    sun.misc.PerfCounter.getFindClasses().increment();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span> (resolve) &#123;</div><div class="line">                resolveClass(c);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> c;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h2 id="6-自定义ClassLoader"><a href="#6-自定义ClassLoader" class="headerlink" title="6. 自定义ClassLoader"></a>6. 自定义ClassLoader</h2><ol>
-<li>重写findClass()方法</li>
-<li>将类字节码文件读取进来</li>
-<li>用defineClass()方法将加载到jvm<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestClassLoader</span> <span class="keyword">extends</span> <span class="title">ClassLoader</span> </span>&#123;</div><div class="line">	String path;</div><div class="line">	String name;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">TestClassLoader</span><span class="params">(String name,String path)</span></span>&#123;</div><div class="line">		<span class="keyword">super</span>();</div><div class="line">		<span class="keyword">this</span>.name = name;</div><div class="line">		<span class="keyword">this</span>.path = path;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">TestClassLoader</span><span class="params">(ClassLoader parent,String name,String path)</span></span>&#123;</div><div class="line">		<span class="keyword">super</span>(parent);</div><div class="line">		<span class="keyword">this</span>.name = name;</div><div class="line">		<span class="keyword">this</span>.path = path;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</div><div class="line">		<span class="keyword">byte</span>[] data = getDataFromClassFile(name);</div><div class="line">		<span class="keyword">return</span> defineClass(name, data, <span class="number">0</span>, data.length);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="keyword">byte</span>[] getDataFromClassFile(String name)&#123;</div><div class="line">		<span class="keyword">byte</span>[] returnData = <span class="keyword">null</span>;</div><div class="line">		name = name.replaceAll(<span class="string">"\\."</span>, <span class="string">"/"</span>);</div><div class="line">		path = path + name + <span class="string">".class"</span>;</div><div class="line">		InputStream is = <span class="keyword">null</span>;</div><div class="line">		ByteArrayOutputStream os =<span class="keyword">null</span>;</div><div class="line">		</div><div class="line">		<span class="keyword">try</span>&#123;</div><div class="line">			is = <span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(path));</div><div class="line">			os = <span class="keyword">new</span> ByteArrayOutputStream();</div><div class="line">			<span class="keyword">int</span> len;</div><div class="line">			<span class="keyword">while</span> ((len = is.read()) != -<span class="number">1</span>) &#123;</div><div class="line">				os.write(len);</div><div class="line">			&#125;</div><div class="line">			returnData = os.toByteArray();</div><div class="line">		&#125;<span class="keyword">catch</span>(Exception e)&#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;<span class="keyword">finally</span>&#123;</div><div class="line">			<span class="keyword">try</span>&#123;</div><div class="line">				<span class="keyword">if</span>(is!=<span class="keyword">null</span>)&#123;</div><div class="line">					is.close();</div><div class="line">				&#125;</div><div class="line">				<span class="keyword">if</span>(os!=<span class="keyword">null</span>)&#123;</div><div class="line">					os.close();</div><div class="line">				&#125;</div><div class="line">			&#125;<span class="keyword">catch</span>(Exception e)&#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">return</span> returnData;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">this</span>.name;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></li>
-</ol>
-
+        
+          <a class="article-more-a" href="/2017/09/05/ClassLoader分析/#more">more >></a>
+        
       
 
       
@@ -1199,6 +1171,18 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">HTTPS</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">网络协议</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">TLS</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">NIO</a>
               </li>
              
@@ -1215,15 +1199,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">HTTPS</a>
+                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">网络协议</a>
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">TLS</a>
+                <a href="javascript:void(0)" class="js-tag color4">拦截器</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1239,18 +1223,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">拦截器</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">心理学</a>
               </li>
              
@@ -1259,15 +1231,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">实现原理</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">java字节码</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">CountDownLatch</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">实现原理</a>
               </li>
              
               <li class="article-tag-list-item">
