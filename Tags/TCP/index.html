@@ -6,19 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://118.89.22.123">
-  <title>实现CountDownLatch相似功能 | peishen&#39;s blog</title>
+  <title>Tag: TCP | peishen&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1. CountDownLatch1.1 简介CountDownLatch是一个同步工具类，允许一个或多个线程等待其他线程操作完成后才执行，比如生活中炒菜的例子，要炒菜之前，得准备好油盐酱醋，切好菜，准备好工具，等待这些工作做完了，才可以真的炒菜，用线程方式表示就是  线程A ： 炒菜线程B ： 酱料准备线程C ： 切菜线程D ： 工具当线程B，C，D操作完成，线程A才会执行，CountDownL">
-<meta name="keywords" content="java并发,CountDownLatch">
-<meta property="og:type" content="article">
-<meta property="og:title" content="实现CountDownLatch相似功能">
-<meta property="og:url" content="http://118.89.22.123/2017/06/26/实现CountDownLatch相似功能/index.html">
+  <meta name="description" content="ר�з�����Java��̨�������ȿ��������ż������ߣ����Ը����鼮��">
+<meta name="keywords" content="Java,Spring,jquery,MyBatis,Java����,������,����Գ,������,����,���,����,��Դ,IT��վ,Developer,Programmer,Coder,Geek,,�û�����">
+<meta property="og:type" content="website">
+<meta property="og:title" content="peishen&#39;s blog">
+<meta property="og:url" content="http://118.89.22.123/tags/TCP/index.html">
 <meta property="og:site_name" content="peishen&#39;s blog">
-<meta property="og:description" content="1. CountDownLatch1.1 简介CountDownLatch是一个同步工具类，允许一个或多个线程等待其他线程操作完成后才执行，比如生活中炒菜的例子，要炒菜之前，得准备好油盐酱醋，切好菜，准备好工具，等待这些工作做完了，才可以真的炒菜，用线程方式表示就是  线程A ： 炒菜线程B ： 酱料准备线程C ： 切菜线程D ： 工具当线程B，C，D操作完成，线程A才会执行，CountDownL">
-<meta property="og:updated_time" content="2017-08-31T11:41:18.849Z">
+<meta property="og:description" content="ר�з�����Java��̨�������ȿ��������ż������ߣ����Ը����鼮��">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="实现CountDownLatch相似功能">
-<meta name="twitter:description" content="1. CountDownLatch1.1 简介CountDownLatch是一个同步工具类，允许一个或多个线程等待其他线程操作完成后才执行，比如生活中炒菜的例子，要炒菜之前，得准备好油盐酱醋，切好菜，准备好工具，等待这些工作做完了，才可以真的炒菜，用线程方式表示就是  线程A ： 炒菜线程B ： 酱料准备线程C ： 切菜线程D ： 工具当线程B，C，D操作完成，线程A才会执行，CountDownL">
+<meta name="twitter:title" content="peishen&#39;s blog">
+<meta name="twitter:description" content="ר�з�����Java��̨�������ȿ��������ż������ߣ����Ը����鼮��">
   
     <link rel="alternative" href="/atom.xml" title="peishen&#39;s blog" type="application/atom+xml">
   
@@ -154,81 +153,52 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-实现CountDownLatch相似功能" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      实现CountDownLatch相似功能
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2017" class="archive-year">2017</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2017/09/14/TCP三次握手和四次挥手/" class="archive-article-date">
+  	<time datetime="2017-09-13T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-14</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2017/09/14/TCP三次握手和四次挥手/">TCP三次握手与四次挥手</a>
     </h1>
   
 
-        
-        <a href="/2017/06/26/实现CountDownLatch相似功能/" class="archive-article-date">
-  	<time datetime="2017-06-26T12:16:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-06-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-CountDownLatch"><a href="#1-CountDownLatch" class="headerlink" title="1. CountDownLatch"></a>1. CountDownLatch</h1><h2 id="1-1-简介"><a href="#1-1-简介" class="headerlink" title="1.1 简介"></a>1.1 简介</h2><p>CountDownLatch是一个同步工具类，允许一个或多个线程等待其他线程操作完成后才执行，比如生活中炒菜的例子，要炒菜之前，得准备好油盐酱醋，切好菜，准备好工具，等待这些工作做完了，才可以真的炒菜，用线程方式表示就是</p>
-<blockquote>
-<p>线程A ： 炒菜<br>线程B ： 酱料准备<br>线程C ： 切菜<br>线程D ： 工具<br>当线程B，C，D操作完成，线程A才会执行，CountDownLatch就是实现这种需求的工具类。</p>
-</blockquote>
-<a id="more"></a>
-<h2 id="1-2-使用代码"><a href="#1-2-使用代码" class="headerlink" title="1.2 使用代码"></a>1.2 使用代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CountDownLatchDemo</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">static</span> CountDownLatch end = <span class="keyword">new</span> CountDownLatch(<span class="number">10</span>);</div><div class="line">    <span class="keyword">static</span> CountDownLatchDemo demo = <span class="keyword">new</span> CountDownLatchDemo();</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="comment">//模拟检查</span></div><div class="line">            Thread.sleep(<span class="keyword">new</span> Random().nextInt(<span class="number">10</span>)*<span class="number">1000</span>);</div><div class="line">            end.countDown();</div><div class="line">            System.out.println(<span class="string">"check over ,count = "</span>+end.getCount());</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        ExecutorService exec = Executors.newFixedThreadPool(<span class="number">10</span>);</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</div><div class="line">            exec.submit(demo);</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//等待其他线程完成</span></div><div class="line">        end.await();</div><div class="line">        System.out.println(<span class="string">"count数量为 "</span>+end.getCount()+<span class="string">",其他准备工作已完成!"</span>);</div><div class="line">        exec.shutdown();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="2-实现简单CountDownLatch"><a href="#2-实现简单CountDownLatch" class="headerlink" title="2. 实现简单CountDownLatch"></a>2. 实现简单CountDownLatch</h1><h2 id="2-1-思路"><a href="#2-1-思路" class="headerlink" title="2.1 思路"></a>2.1 思路</h2><p><strong>使用Condition的await方法实现线程等待，使用Condition的signal方法实现唤醒</strong></p>
-<ul>
-<li><p><strong>countDown()</strong></p>
-<blockquote>
-<ol>
-<li>count计数减一</li>
-<li>当count为0时，使用Condition实例的signal方法来唤醒最终线程</li>
-</ol>
-</blockquote>
-</li>
-<li><p><strong>await()</strong></p>
-<blockquote>
-<p>使用Condition实例的await方法</p>
-</blockquote>
-</li>
-<li><p><strong>注意点</strong></p>
-<blockquote>
-<ol>
-<li>Condition实例方法得配合ReentrantLock来使用</li>
-<li>使用Condition的await和signal之前，都得使用ReentrantLock获得锁，就像Object.wait()使用前得获取对象锁一样，也就是获取监视器<br>| 方法 | 监视器 |<br>| —- | — |<br>| Object.wait() Object.notify() | Monitor |<br>| await()  signal() | ReentrantLock.lock() |</li>
-</ol>
-</blockquote>
-</li>
-</ul>
-<h2 id="2-2-代码"><a href="#2-2-代码" class="headerlink" title="2.2 代码"></a>2.2 代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConditionCountDownDemo</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</div><div class="line">    <span class="comment">//用Condition实现CountDownLatch功能</span></div><div class="line">    <span class="keyword">static</span> ReentrantLock reentrantLock = <span class="keyword">new</span> ReentrantLock();</div><div class="line">    <span class="keyword">static</span> Condition condition = reentrantLock.newCondition();</div><div class="line">    <span class="keyword">static</span> ConditionCountDown conditionCountDown = <span class="keyword">new</span> ConditionCountDown(<span class="number">10</span>);</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span>&#123;</div><div class="line">            conditionCountDown.countDown();</div><div class="line">            <span class="comment">//Thread.sleep(new Random().nextInt(10)*1000);</span></div><div class="line">            System.out.println(<span class="string">"check over ,count = "</span>+conditionCountDown.getCount());</div><div class="line">        &#125;<span class="keyword">catch</span>(Exception e)&#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ConditionCountDown</span></span>&#123;</div><div class="line">        <span class="comment">//计数器</span></div><div class="line">        <span class="keyword">int</span> count = <span class="number">0</span>;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="title">ConditionCountDown</span><span class="params">(<span class="keyword">int</span> count)</span></span>&#123;</div><div class="line">            <span class="keyword">this</span>.count = count;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">countDown</span><span class="params">()</span></span>&#123;</div><div class="line">            count--;</div><div class="line">            reentrantLock.lock();</div><div class="line">            <span class="keyword">try</span>&#123;</div><div class="line">                <span class="comment">//线程做完，才signal主线程</span></div><div class="line">                <span class="keyword">if</span>(count == <span class="number">0</span>)&#123;</div><div class="line">                    condition.signal();</div><div class="line">                &#125;</div><div class="line">            &#125;<span class="keyword">finally</span>&#123;</div><div class="line">                reentrantLock.unlock();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">int</span> <span class="title">getCount</span><span class="params">()</span></span>&#123;</div><div class="line">            <span class="keyword">return</span> count;</div><div class="line">        &#125;</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">await</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">            reentrantLock.lock();</div><div class="line">            <span class="keyword">try</span>&#123;</div><div class="line">                <span class="comment">//处于等待唤醒状态</span></div><div class="line">                condition.await();</div><div class="line">            &#125;<span class="keyword">finally</span>&#123;</div><div class="line">                reentrantLock.unlock();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        ConditionCountDownDemo con = <span class="keyword">new</span> ConditionCountDownDemo();</div><div class="line">        ExecutorService exec = Executors.newFixedThreadPool(<span class="number">10</span>);</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;exec.submit(con);&#125;</div><div class="line">        conditionCountDown.await();</div><div class="line">        System.out.println(<span class="string">"notify"</span>);</div><div class="line">        exec.shutdown();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">java并发</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">网络</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">CountDownLatch</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">TCP</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -241,136 +211,17 @@
 	</div>
 
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://118.89.22.123/2017/06/26/实现CountDownLatch相似功能/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2017/06/30/AQS分析/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          AbstractQueuedSynchronizer源码分析
-        
-      </div>
-    </a>
   
   
-</nav>
-
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-        <div class="toc-container tooltip-left">
-            <i class="icon-font icon-category"></i>
-            <div class="tooltip tooltip-east">
-                <span class="tooltip-item">
-                </span>
-                <span class="tooltip-content">
-                    <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-CountDownLatch"><span class="toc-number">1.</span> <span class="toc-text">1. CountDownLatch</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-简介"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-使用代码"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 使用代码</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-实现简单CountDownLatch"><span class="toc-number">2.</span> <span class="toc-text">2. 实现简单CountDownLatch</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-思路"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-代码"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 代码</span></a></li></ol></li></ol>
-                    </div>
-                </span>
-            </div>
-        </div>
-        
-    </div>
-</aside>
-
-
-
-	
-		<!-- ������City�氲װ���� -->
-<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTYyOC82MTk2">
-<script type="text/javascript">
-   (function(d, s) {
-       var j, e = d.getElementsByTagName(s)[0];
-       if (typeof LivereTower === 'function') { return; }
-       j = d.createElement(s);
-       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-       j.async = true;
-       e.parentNode.insertBefore(j, e);
-   })(document, 'script');
-</script>
-<noscript>Ϊ����ʹ�����������۹����뼤��JavaScript</noscript>
-</div>
-<!-- City�氲װ��������� -->
-	
-  
-  
+    </div></section>
   
 
-  
-
-  
+    
 
 
           </div>
@@ -398,9 +249,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
