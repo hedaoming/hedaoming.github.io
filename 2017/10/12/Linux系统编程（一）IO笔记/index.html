@@ -6,18 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://118.89.22.123">
-  <title>Archives: 2017 | peishen&#39;s blog</title>
+  <title>Linux系统编程（一）：文件IO | peishen&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="ר�з�����Java��̨�������ȿ��������ż������ߣ����Ը����鼮��">
-<meta name="keywords" content="Java,Spring,jquery,MyBatis,Java����,������,����Գ,������,����,���,����,��Դ,IT��վ,Developer,Programmer,Coder,Geek,,�û�����">
-<meta property="og:type" content="website">
-<meta property="og:title" content="peishen&#39;s blog">
-<meta property="og:url" content="http://118.89.22.123/archives/2017/page/2/index.html">
+  <meta name="description" content="1. open1.1 文件描述符文件描述符存储在进程PCB块中的一个数据结构内，指向设备文件，通过文件描述符就能操作文件，而打开文件是通过 **int open(const char *pathname, int flags, mode_t mode)**,返回值就是对应文件的描述符，在Linux中，每个进程默认打开三个文件，分别是 STDIN_FILENO：0，标准输入 STDOUT_FILEN">
+<meta name="keywords" content="Linux,操作系统,文件IO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统编程（一）：文件IO">
+<meta property="og:url" content="http://118.89.22.123/2017/10/12/Linux系统编程（一）IO笔记/index.html">
 <meta property="og:site_name" content="peishen&#39;s blog">
-<meta property="og:description" content="ר�з�����Java��̨�������ȿ��������ż������ߣ����Ը����鼮��">
+<meta property="og:description" content="1. open1.1 文件描述符文件描述符存储在进程PCB块中的一个数据结构内，指向设备文件，通过文件描述符就能操作文件，而打开文件是通过 **int open(const char *pathname, int flags, mode_t mode)**,返回值就是对应文件的描述符，在Linux中，每个进程默认打开三个文件，分别是 STDIN_FILENO：0，标准输入 STDOUT_FILEN">
+<meta property="og:image" content="https://github.com/hedaoming/peishen.github.io/raw/98b2b55b0a3deaf2c03f36311b6c172b2bbc0af0/imgs/2017/10/12/%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6.png">
+<meta property="og:image" content="https://github.com/hedaoming/peishen.github.io/raw/98b2b55b0a3deaf2c03f36311b6c172b2bbc0af0/imgs/2017/10/12/IO%E7%BC%93%E5%86%B2%E5%8C%BA.png">
+<meta property="og:image" content="https://github.com/hedaoming/peishen.github.io/raw/98b2b55b0a3deaf2c03f36311b6c172b2bbc0af0/imgs/2017/10/12/errno.png">
+<meta property="og:updated_time" content="2017-10-11T16:31:19.743Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="peishen&#39;s blog">
-<meta name="twitter:description" content="ר�з�����Java��̨�������ȿ��������ż������ߣ����Ը����鼮��">
+<meta name="twitter:title" content="Linux系统编程（一）：文件IO">
+<meta name="twitter:description" content="1. open1.1 文件描述符文件描述符存储在进程PCB块中的一个数据结构内，指向设备文件，通过文件描述符就能操作文件，而打开文件是通过 **int open(const char *pathname, int flags, mode_t mode)**,返回值就是对应文件的描述符，在Linux中，每个进程默认打开三个文件，分别是 STDIN_FILENO：0，标准输入 STDOUT_FILEN">
+<meta name="twitter:image" content="https://github.com/hedaoming/peishen.github.io/raw/98b2b55b0a3deaf2c03f36311b6c172b2bbc0af0/imgs/2017/10/12/%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6.png">
   
     <link rel="alternative" href="/atom.xml" title="peishen&#39;s blog" type="application/atom+xml">
   
@@ -153,158 +158,120 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-Linux系统编程（一）IO笔记" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Linux系统编程（一）：文件IO
+    </h1>
+  
+
+        
+        <a href="/2017/10/12/Linux系统编程（一）IO笔记/" class="archive-article-date">
+  	<time datetime="2017-10-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-10-12</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-open"><a href="#1-open" class="headerlink" title="1. open"></a>1. open</h1><h2 id="1-1-文件描述符"><a href="#1-1-文件描述符" class="headerlink" title="1.1 文件描述符"></a>1.1 文件描述符</h2><pre><code>文件描述符存储在进程PCB块中的一个数据结构内，指向设备文件，通过文件描述符就能操作文件，而打开文件是通过 **int open(const char *pathname, int flags, mode_t mode)**,返回值就是对应文件的描述符，在Linux中，每个进程默认打开三个文件，分别是
+STDIN_FILENO：0，标准输入
+STDOUT_FILENO：1，标准输出
+STDERR_FILENO：2，错误
+</code></pre><a id="more"></a>
+<p><img src="https://github.com/hedaoming/peishen.github.io/raw/98b2b55b0a3deaf2c03f36311b6c172b2bbc0af0/imgs/2017/10/12/%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6.png" alt=""></p>
+<h2 id="1-2-flags和mode"><a href="#1-2-flags和mode" class="headerlink" title="1.2 flags和mode"></a>1.2 flags和mode</h2><blockquote>
+<ol>
+<li>flags : <strong>flags指定文件属性</strong>，比如非阻塞、追加、只读等，flags<strong>只能有一个必选项</strong>，就是<strong>O_RDONLY，O_WRONLY，O_RDWR</strong>中之一，要是多个必选项，则或运算起来的结果会变成不可识别，比如， O_RDONLY | O_WRONLY = 1,结果是RD，会变得不可预测，所以只能有一个必选。</li>
+<li>mode : <strong>mode指定文件权限（文件属性为创建时）</strong><pre><code>S_IRWXU : 所有用户有可写可读可执行 
+S_IRWXG : 所有组成员有可读可写可执行 
+S_IROTH : 其他用户只有可读权限
+....
+</code></pre> flags和mode的宏定义在：/usr/src/linux-headers-4.10.0-35/include/uapi/asm-generic/fcntl.h中</li>
+</ol>
+</blockquote>
+<h2 id="1-3-close"><a href="#1-3-close" class="headerlink" title="1.3 close"></a>1.3 close</h2><blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;close是关闭文件，即释放对应文件描述符 ，程序结束时一般会自动释放所有的文件描述符，不过在长期运行的程序中，比如服务器程序，一直不关闭的话，是会<strong>一直占用文件描述符</strong>，可能会导致文件描述符被使用完，所以有些时候需要手动通过close来关闭文件描述符，关闭之后，继续用open打开文件时，返回的文件描述符是最新的文件描述符，可利用这点<strong>将输出从终端重定向输出到文件中</strong>。</p>
+</blockquote>
+<h2 id="1-4-IO缓冲区"><a href="#1-4-IO缓冲区" class="headerlink" title="1.4 IO缓冲区"></a>1.4 IO缓冲区</h2><p><img src="https://github.com/hedaoming/peishen.github.io/raw/98b2b55b0a3deaf2c03f36311b6c172b2bbc0af0/imgs/2017/10/12/IO%E7%BC%93%E5%86%B2%E5%8C%BA.png" alt=""><br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">重定向输出</div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">        <span class="keyword">if</span>(argc&lt;<span class="number">1</span>)&#123;</div><div class="line">                <span class="built_in">printf</span>(<span class="string">"需要输入重定向输出文件名"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;   </div><div class="line">        close(STDOUT_FILENO);</div><div class="line">        <span class="keyword">int</span> fd; </div><div class="line">        fd = open(argv[<span class="number">1</span>],O_WRONLY | O_CREAT | O_TRUNC,S_IRWXU);</div><div class="line">        <span class="keyword">if</span>(fd&lt;<span class="number">0</span>)&#123;</div><div class="line">                perror(<span class="string">"open file"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;   </div><div class="line"></div><div class="line">        <span class="built_in">printf</span>(<span class="string">"world\n"</span>);</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"hello\n"</span>);</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h1 id="2-read-write"><a href="#2-read-write" class="headerlink" title="2. read write"></a>2. read write</h1><h2 id="2-1-实现cp命令"><a href="#2-1-实现cp命令" class="headerlink" title="2.1 实现cp命令"></a>2.1 实现cp命令</h2><blockquote>
+<p>原理：读取并写入新文件</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">        <span class="keyword">char</span> buf[<span class="number">10</span>];</div><div class="line">        <span class="keyword">int</span> rfd ,wfd ,n; </div><div class="line">        rfd = open(argv[<span class="number">1</span>],O_RDONLY);</div><div class="line">        wfd = open(argv[<span class="number">2</span>],O_WRONLY | O_CREAT | O_TRUNC);</div><div class="line">        <span class="keyword">if</span>(rfd&lt;<span class="number">0</span>)&#123;</div><div class="line">                perror(<span class="string">"open file"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span>(wfd&lt;<span class="number">0</span>)&#123;</div><div class="line">                perror(<span class="string">"open writeFile"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">while</span>( (n = read(rfd,buf,<span class="number">10</span>)) &gt; <span class="number">0</span>)&#123; </div><div class="line">                write(wfd,buf,n);</div><div class="line">        &#125;</div><div class="line">        close(rfd);</div><div class="line">        close(wfd);</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span>;    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="2-2-非阻塞读取"><a href="#2-2-非阻塞读取" class="headerlink" title="2.2 非阻塞读取"></a>2.2 非阻塞读取</h2><blockquote>
+<p>read不存在阻塞，只是读取的一个动作，阻塞是在open函数中指定文件的状态，阻塞 或 非阻塞</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">define</span> MSG_TRY <span class="meta-string">"try again\n"</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></div><div class="line">&#123;</div><div class="line">        <span class="keyword">char</span> buf[<span class="number">10</span>];</div><div class="line">        <span class="keyword">int</span> fd,n;</div><div class="line">        fd = open(<span class="string">"/dev/tty"</span>,O_RDONLY | O_NONBLOCK); <span class="comment">// 指定属性是非阻塞</span></div><div class="line">        <span class="keyword">if</span>(fd&lt;<span class="number">0</span>)&#123;</div><div class="line">                perror(<span class="string">"open /dev/tty"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">tryagain:</div><div class="line">        n = read(fd,buf,<span class="number">10</span>); <span class="comment">// 非阻塞读取   </span></div><div class="line">        <span class="keyword">if</span>(n&lt;<span class="number">0</span>)&#123;</div><div class="line">                <span class="keyword">if</span>(errno==EAGAIN)&#123;</div><div class="line">                        sleep(<span class="number">1</span>);</div><div class="line">                        write(<span class="number">1</span>,MSG_TRY,<span class="built_in">strlen</span>(MSG_TRY));</div><div class="line">                        <span class="keyword">goto</span> tryagain;</div><div class="line">                &#125;    </div><div class="line">                perror(<span class="string">"read /dev/tty"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">        write(<span class="number">1</span>,buf,<span class="built_in">strlen</span>(buf));</div><div class="line">        close(fd);</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="3-lseek"><a href="#3-lseek" class="headerlink" title="3. lseek"></a>3. lseek</h1><h2 id="3-1-lseek-文件描述符，偏移量，whence"><a href="#3-1-lseek-文件描述符，偏移量，whence" class="headerlink" title="3.1 lseek(文件描述符，偏移量，whence);"></a>3.1 lseek(文件描述符，偏移量，whence);</h2><pre><code>whence:    
+    1. SEEK_SET
+    2. SEEK_CUR
+    3. SEEK_END
+1. 通过指针来操作文件
+2. 可以通过偏移指针+SEEK_END来扩大文件大小:得有一次写操作才能改变文件
+3. 获取文件大小：printf(&quot;lseek size = %d\n&quot;,lseek(fd,0,SEEK_END));
+</code></pre><h2 id="3-2-实现touch命令"><a href="#3-2-实现touch命令" class="headerlink" title="3.2 实现touch命令"></a>3.2 实现touch命令</h2><blockquote>
+<p>lseek创建空文件时，需要写出操作才能将内容输出，用\0补齐空内容</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">        <span class="keyword">int</span> fd; </div><div class="line">        <span class="keyword">if</span>(argc&lt;<span class="number">1</span>)&#123;</div><div class="line">                perror(<span class="string">"需要输入文件名"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">        fd = open(argv[<span class="number">1</span>],O_WRONLY | O_CREAT | O_TRUNC,S_IRWXU);</div><div class="line">        <span class="keyword">if</span>(fd&lt;<span class="number">0</span>)&#123;</div><div class="line">                perror(<span class="string">"open file"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">        lseek(fd,<span class="number">10240</span>,SEEK_END);</div><div class="line">        <span class="keyword">int</span> result = write(fd,<span class="string">"1"</span>,<span class="built_in">strlen</span>(<span class="string">"1"</span>));</div><div class="line">        <span class="keyword">if</span>(result&lt;<span class="number">0</span>)&#123;</div><div class="line">                perror(<span class="string">"write file"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="4-fcntl"><a href="#4-fcntl" class="headerlink" title="4. fcntl"></a>4. fcntl</h1><pre><code>1. 设置文件权限
+    1.1 文件还未打开：用open来指定文件属性
+    1.2 文件已经打开：用fcntl来修改文件属性
+
+2. 使用
+    两次使用fcntl
+    第一次：获取flags;通过fcntl来获取文件已有的权限(int flags = fcntl(fd,F_GETFL))
+    第二次：修改flags;通过设置新flags来设置新权限
+        flags |= O_NONBLOCK;
+        fcntl(fd,F_SETFL,flags)
+</code></pre><h2 id="4-1-实现非阻塞读取"><a href="#4-1-实现非阻塞读取" class="headerlink" title="4.1 实现非阻塞读取"></a>4.1 实现非阻塞读取</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></div><div class="line">&#123;</div><div class="line">        <span class="keyword">int</span> flags,n;</div><div class="line">        <span class="keyword">char</span> buf[<span class="number">10</span>];</div><div class="line">        flags = fcntl(STDIN_FILENO,F_GETFL);<span class="comment">// 1. 获取文件属性值</span></div><div class="line">        flags |= O_NONBLOCK; <span class="comment">// 2. 修改文件属性值</span></div><div class="line">        <span class="keyword">if</span>(fcntl(STDIN_FILENO,F_SETFL,flags)==<span class="number">-1</span>)&#123; <span class="comment">//3. 设置新的文件属性值</span></div><div class="line">                perror(<span class="string">"STDIN"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">tryagain:</div><div class="line">        n = read(STDIN_FILENO,buf,<span class="number">10</span>);</div><div class="line">        <span class="keyword">if</span>( n &lt; <span class="number">0</span> )&#123;</div><div class="line">                <span class="keyword">if</span>(errno == EAGAIN)&#123;</div><div class="line">                        sleep(<span class="number">1</span>);</div><div class="line">                        write(STDOUT_FILENO,<span class="string">"try again\n"</span>,<span class="built_in">strlen</span>(<span class="string">"try again\n"</span>));</div><div class="line">                        <span class="keyword">goto</span> tryagain;</div><div class="line">                &#125;</div><div class="line">                perror(<span class="string">"read IN"</span>);</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">        write(STDOUT_FILENO,buf,n);</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="5-ioctl"><a href="#5-ioctl" class="headerlink" title="5. ioctl"></a>5. ioctl</h1><pre><code>1. 向设备发控制和配置命令，是设备物理的属性，比如串口的波特率等
+2. 每个设备的物理特性都不同，需控制也不同
+3. 一般设备的物理特性是用read/write函数控制不来，属于out of band，read/write属于in band
+</code></pre><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/ioctl.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></div><div class="line">&#123;</div><div class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">winsize</span> <span class="title">size</span>;</span></div><div class="line">        <span class="keyword">if</span>(isatty(STDOUT_FILENO)==<span class="number">0</span>)&#123;</div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);    </div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span>(ioctl(STDOUT_FILENO,TIOCGWINSZ,&amp;size)&lt;<span class="number">0</span>)&#123;<span class="comment">//获取窗口大小（物理属性）</span></div><div class="line">                perror(<span class="string">"ioctl TIOCGWINSZ error"</span>);    </div><div class="line">                <span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"%d rows,%d columns \n"</span>,size.ws_row,size.ws_col);</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="6-挂起-睡眠"><a href="#6-挂起-睡眠" class="headerlink" title="6. 挂起,睡眠"></a>6. 挂起,睡眠</h1><pre><code>1. 挂起，睡眠都是一种行为，而阻塞，运行是一种状态
+2. 挂起：想恢复运行得有人去被动唤醒
+3. 睡眠：设置睡眠时间后，自己会主动唤醒
+</code></pre><h1 id="7-错误处理perror"><a href="#7-错误处理perror" class="headerlink" title="7. 错误处理perror"></a>7. 错误处理perror</h1><blockquote>
+<p>perror是根据全局变量errno来确定输出错误的内容</p>
+</blockquote>
+<p><img src="https://github.com/hedaoming/peishen.github.io/raw/98b2b55b0a3deaf2c03f36311b6c172b2bbc0af0/imgs/2017/10/12/errno.png" alt=""></p>
+<h1 id="linux-系统函数源代码：-usr-src-linux-headers-4-10-0-35"><a href="#linux-系统函数源代码：-usr-src-linux-headers-4-10-0-35" class="headerlink" title="linux 系统函数源代码：/usr/src/linux-headers-4.10.0-35/"></a>linux 系统函数源代码：/usr/src/linux-headers-4.10.0-35/</h1><h1 id="疑问"><a href="#疑问" class="headerlink" title="疑问"></a>疑问</h1><pre><code>1. exit:
+    exit(1);
+    exit(0);
+    exit(-1);各代表了什么意思
+2. 结构体有什么用
+</code></pre>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/07/29/RAID和HDFS浅析/" class="archive-article-date">
-  	<time datetime="2017-07-28T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-29</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/07/29/RAID和HDFS浅析/">RAID和HDFS浅析</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">RAID</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">HDFS</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术/" class="article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/07/27/ThreadLocal浅析/" class="archive-article-date">
-  	<time datetime="2017-07-26T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/07/27/ThreadLocal浅析/">ThreadLocal浅析</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">java并发</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术/" class="article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/07/24/token的分析/" class="archive-article-date">
-  	<time datetime="2017-07-23T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-24</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/07/24/token的分析/">token维持登录状态</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">登录机制</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">session</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">token</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">文件IO</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -317,330 +284,131 @@
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://118.89.22.123/2017/10/12/Linux系统编程（一）IO笔记/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/07/23/springMVC拦截器分析/" class="archive-article-date">
-  	<time datetime="2017-07-22T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-23</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2017/09/14/TCP三次握手和四次挥手/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">TCP三次握手与四次挥手</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/07/23/springMVC拦截器分析/">SpringMVC拦截器分析</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Spring</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">SpringMVC</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">拦截器</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术/" class="article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-open"><span class="toc-number">1.</span> <span class="toc-text">1. open</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-文件描述符"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 文件描述符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-flags和mode"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 flags和mode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-close"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 close</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-IO缓冲区"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 IO缓冲区</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-read-write"><span class="toc-number">2.</span> <span class="toc-text">2. read write</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-实现cp命令"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 实现cp命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-非阻塞读取"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 非阻塞读取</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-lseek"><span class="toc-number">3.</span> <span class="toc-text">3. lseek</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-lseek-文件描述符，偏移量，whence"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 lseek(文件描述符，偏移量，whence);</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-实现touch命令"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 实现touch命令</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-fcntl"><span class="toc-number">4.</span> <span class="toc-text">4. fcntl</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-实现非阻塞读取"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 实现非阻塞读取</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-ioctl"><span class="toc-number">5.</span> <span class="toc-text">5. ioctl</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-挂起-睡眠"><span class="toc-number">6.</span> <span class="toc-text">6. 挂起,睡眠</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-错误处理perror"><span class="toc-number">7.</span> <span class="toc-text">7. 错误处理perror</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#linux-系统函数源代码：-usr-src-linux-headers-4-10-0-35"><span class="toc-number">8.</span> <span class="toc-text">linux 系统函数源代码：/usr/src/linux-headers-4.10.0-35/</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#疑问"><span class="toc-number">9.</span> <span class="toc-text">疑问</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/07/23/个别案例的不可靠性/" class="archive-article-date">
-  	<time datetime="2017-07-22T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/07/23/个别案例的不可靠性/">个别案例的不可靠性</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">心理学</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">个体案例误区</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/阅读/" class="article-tag-list-link color3">阅读</a>
-        		</li>
-      		
-		</ul>
-	</div>
+        
+    </div>
+</aside>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/07/12/BlockingQueue分析/" class="archive-article-date">
-  	<time datetime="2017-07-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-12</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/07/12/BlockingQueue分析/">BlockingQueue原理分析</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">java并发</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术/" class="article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/07/03/字节码执行过程分析/" class="archive-article-date">
-  	<time datetime="2017-07-02T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-03</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/07/03/字节码执行过程分析/">字节码执行过程分析</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">java字节码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术/" class="article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/06/30/AQS分析/" class="archive-article-date">
-  	<time datetime="2017-06-29T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-06-30</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/06/30/AQS分析/">AbstractQueuedSynchronizer源码分析</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">java并发</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术/" class="article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/06/26/实现CountDownLatch相似功能/" class="archive-article-date">
-  	<time datetime="2017-06-26T12:16:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-06-26</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/06/26/实现CountDownLatch相似功能/">实现CountDownLatch相似功能</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">java并发</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">CountDownLatch</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术/" class="article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+	
+		<!-- ������City�氲װ���� -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTYyOC82MTk2">
+<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+       if (typeof LivereTower === 'function') { return; }
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+</script>
+<noscript>Ϊ����ʹ�����������۹����뼤��JavaScript</noscript>
+</div>
+<!-- City�氲װ��������� -->
+	
   
   
-    </div></section>
   
 
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2017/">&laquo; Prev</a><a class="page-number" href="/archives/2017/">1</a><span class="page-number current">2</span>
-    </nav>
+  
+
   
 
 
@@ -669,8 +437,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
