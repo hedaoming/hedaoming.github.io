@@ -6,21 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://118.89.22.123">
-  <title>AbstractQueuedSynchronizer源码分析 | peishen&#39;s blog</title>
+  <title>Linux系统编程（三）：进程 | peishen&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的tryAcquire和tryRelease方法的，所以了解AQS的原理以及结构有助于了解其他并发类。">
-<meta name="keywords" content="java并发">
+  <meta name="description" content="1. 进程相关命令ulimit -a : 显示进程的参数限制;比如最大打开文件个数 ulimit -n 数字: 修改文件打开个数 cat /proc/self/limits : 查看进程的一些limit，修改limit之后会导致这文件的值的变化     /proc : 伪文件系统，记录一些内核相关的信息，比如进程/cpu/文件系统等。     /self ：链接到当前运行的进程，即记录当前进程的">
+<meta name="keywords" content="Linux,操作系统,进程">
 <meta property="og:type" content="article">
-<meta property="og:title" content="AbstractQueuedSynchronizer源码分析">
-<meta property="og:url" content="http://118.89.22.123/2017/06/30/AQS分析/index.html">
+<meta property="og:title" content="Linux系统编程（三）：进程">
+<meta property="og:url" content="http://118.89.22.123/2017/10/28/Linux系统编程（三）进程笔记/index.html">
 <meta property="og:site_name" content="peishen&#39;s blog">
-<meta property="og:description" content="1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的tryAcquire和tryRelease方法的，所以了解AQS的原理以及结构有助于了解其他并发类。">
-<meta property="og:image" content="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/5/AQS%E7%BB%93%E6%9E%84.png">
-<meta property="og:updated_time" content="2017-08-31T11:36:52.648Z">
+<meta property="og:description" content="1. 进程相关命令ulimit -a : 显示进程的参数限制;比如最大打开文件个数 ulimit -n 数字: 修改文件打开个数 cat /proc/self/limits : 查看进程的一些limit，修改limit之后会导致这文件的值的变化     /proc : 伪文件系统，记录一些内核相关的信息，比如进程/cpu/文件系统等。     /self ：链接到当前运行的进程，即记录当前进程的">
+<meta property="og:image" content="https://github.com/hedaoming/peishen.github.io/raw/71c7cda37f40b609b8ff305918d9a7375e859d94/2017/10/28/%E8%BF%9B%E7%A8%8Bxmind.png">
+<meta property="og:image" content="https://github.com/hedaoming/peishen.github.io/raw/71c7cda37f40b609b8ff305918d9a7375e859d94/2017/10/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98.png">
+<meta property="og:updated_time" content="2017-10-28T03:01:12.495Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="AbstractQueuedSynchronizer源码分析">
-<meta name="twitter:description" content="1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的tryAcquire和tryRelease方法的，所以了解AQS的原理以及结构有助于了解其他并发类。">
-<meta name="twitter:image" content="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/5/AQS%E7%BB%93%E6%9E%84.png">
+<meta name="twitter:title" content="Linux系统编程（三）：进程">
+<meta name="twitter:description" content="1. 进程相关命令ulimit -a : 显示进程的参数限制;比如最大打开文件个数 ulimit -n 数字: 修改文件打开个数 cat /proc/self/limits : 查看进程的一些limit，修改limit之后会导致这文件的值的变化     /proc : 伪文件系统，记录一些内核相关的信息，比如进程/cpu/文件系统等。     /self ：链接到当前运行的进程，即记录当前进程的">
+<meta name="twitter:image" content="https://github.com/hedaoming/peishen.github.io/raw/71c7cda37f40b609b8ff305918d9a7375e859d94/2017/10/28/%E8%BF%9B%E7%A8%8Bxmind.png">
   
     <link rel="alternative" href="/atom.xml" title="peishen&#39;s blog" type="application/atom+xml">
   
@@ -156,48 +157,85 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-AQS分析" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-Linux系统编程（三）进程笔记" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      AbstractQueuedSynchronizer源码分析
+      Linux系统编程（三）：进程
     </h1>
   
 
         
-        <a href="/2017/06/30/AQS分析/" class="archive-article-date">
-  	<time datetime="2017-06-29T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-06-30</time>
+        <a href="/2017/10/28/Linux系统编程（三）进程笔记/" class="archive-article-date">
+  	<time datetime="2017-10-27T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-10-28</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="1-AQS介绍"><a href="#1-AQS介绍" class="headerlink" title="1. AQS介绍"></a>1. AQS介绍</h1><p>AQS全名是<font color="red">AbstractQueuedSynchronizer</font>，是JUC（java并发包）的一个<font color="red">同步工具类</font>，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的tryAcquire和tryRelease方法的，所以<font color="red">了解AQS的原理以及结构有助于了解其他并发类</font>。<br><a id="more"></a></p>
-<h1 id="2-AQS和Synchronized"><a href="#2-AQS和Synchronized" class="headerlink" title="2. AQS和Synchronized"></a>2. AQS和Synchronized</h1><h1 id="3-设计AQS的思路"><a href="#3-设计AQS的思路" class="headerlink" title="3. 设计AQS的思路"></a>3. 设计AQS的思路</h1><p>AQS也可以当作是一个同步器，通过同步器来实现锁的功能，控制线程获取资源以及挂起或唤醒线程，从最基础角度来说，AQS定义了如何<font color="red">获取以及释放锁</font>，而获取以及释放锁的操作离不开三个基本点</p>
-<blockquote>
-<ol>
-<li>原子操作：CAS</li>
-<li>等待对列：CLH Lock queue（实现自旋锁，不用挂起到OS，节省资源），通过Node来实现</li>
-<li>挂起或唤醒：LockSupport.park(),LockSupport.unpark();</li>
+        <p><img src="https://github.com/hedaoming/peishen.github.io/raw/71c7cda37f40b609b8ff305918d9a7375e859d94/2017/10/28/%E8%BF%9B%E7%A8%8Bxmind.png" alt=""></p>
+<h1 id="1-进程相关命令"><a href="#1-进程相关命令" class="headerlink" title="1. 进程相关命令"></a>1. 进程相关命令</h1><pre><code>ulimit -a : 显示进程的参数限制;比如最大打开文件个数
+ulimit -n 数字: 修改文件打开个数
+cat /proc/self/limits : 查看进程的一些limit，修改limit之后会导致这文件的值的变化
+    /proc : 伪文件系统，记录一些内核相关的信息，比如进程/cpu/文件系统等。
+    /self ：链接到当前运行的进程，即记录当前进程的一些信息，多个进程之间不共享。
+</code></pre><h1 id="2-进程相关概念"><a href="#2-进程相关概念" class="headerlink" title="2. 进程相关概念"></a>2. 进程相关概念</h1><h2 id="2-1-虚拟内存与进程"><a href="#2-1-虚拟内存与进程" class="headerlink" title="2.1 虚拟内存与进程"></a>2.1 虚拟内存与进程</h2><p><img src="https://github.com/hedaoming/peishen.github.io/raw/71c7cda37f40b609b8ff305918d9a7375e859d94/2017/10/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98.png" alt=""></p>
+<pre><code>1. 每个进程都有4G的虚拟内存空间，存放栈/堆/kernel/代码等
+      kernel：指向相同的物理内存（多个进程共享kernel）--&gt;内核空间(3G-4G)
+      栈/堆/代码：多个进程在物理内存中拥有独立的空间，不能共享--&gt;用户空间(0G-3G)：只能由当前进程访问自己的用户空间
+2. 物理内存中维护一个虚拟内存映射表，维护着虚拟内存与物理内存的关系。 
+3. PCB：每个进程在自己的内核空间中，都有自己的PCB，在物理内存中的一个kernel维护多个的PCB，各个PCB之间彼此可见。
+</code></pre><h2 id="2-2-page页"><a href="#2-2-page页" class="headerlink" title="2.2 page页"></a>2.2 page页</h2><pre><code>  1. page是内存管理的单位，假如 1 page = 4096 bytes 
+2. page可设置访问属性（R/W）:物理内存中，kernel所在的page设置对cpu级别为0的可读可写，对cpu级别为3的不可读不可写了    此时，用户态就无法访问kernel.
+3. malloc(1000):操作系统会分配一个page的空间，即4096bytes，此时利用了1000bytes，下次moclloc时，则会利用page中剩下的空间继续使用
+</code></pre><h2 id="2-3-进程切换"><a href="#2-3-进程切换" class="headerlink" title="2.3 进程切换"></a>2.3 进程切换</h2><pre><code>进程的切换时，需要保存当前的一些数据，比如代码执行到哪一行，这就是保存处理器现场，而每个进程都是拥有短暂时间的cpu执行权，这就利用到了分时复用cpu，具体解释如下：
+  1. 处理器现场：多个进程状态的切换，轮流使用同一个cpu，此时需要将处理器信息保存起来，以便恢复，保存在PCB中的内核栈中。
+  2. 分时复用cpu：每个cpu在某一时刻只能执行一个进程，多个进程需要运行时，为每个进程分配使用cpu的时间。当进程数越多，分配给每个进程的cpu执行时间就越少，系统就越卡顿。
+</code></pre><h2 id="2-4-父进程与子进程"><a href="#2-4-父进程与子进程" class="headerlink" title="2.4 父进程与子进程"></a>2.4 父进程与子进程</h2><pre><code>1. 在shell执行命令时，其实是开启了子进程来执行命令，父进程是shell
+2. 比如在终端输入ls，是通过fork和exec来实现父子进程中的关系
+</code></pre><h1 id="3-进程相关函数"><a href="#3-进程相关函数" class="headerlink" title="3. 进程相关函数"></a>3. 进程相关函数</h1><h2 id="3-1-fork"><a href="#3-1-fork" class="headerlink" title="3.1 fork"></a>3.1 fork</h2><h3 id="3-1-1-作用"><a href="#3-1-1-作用" class="headerlink" title="3.1.1 作用"></a>3.1.1 作用</h3><pre><code>复制出一个子进程，实现多进程。
+</code></pre><h3 id="3-1-2-细节"><a href="#3-1-2-细节" class="headerlink" title="3.1.2 细节"></a>3.1.2 细节</h3><pre><code>空间：通过fork来复制进程，产生的子进程0-3G内容和父进程一样，而3G-4G的kernel中PCB的pid则不同
+返回值： fork();方法返回两次，一次是向父进程返回子进程的pid，另一次是向子进程返回0
+底层原理：
+    creat():创建进程
+    clone():克隆0-3G的内容
+    return ：返回;
+    子进程诞生后执行的第一句就是return，返回0
+执行：fork之前的代码不会被子进程执行，因为子进程clone了父进程的代码以及记录来代码运行到哪，所以前面已运行完的代码不会被执行。
+</code></pre><h3 id="3-1-3-代码使用"><a href="#3-1-3-代码使用" class="headerlink" title="3.1.3 代码使用"></a>3.1.3 代码使用</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></div><div class="line">&#123;</div><div class="line">	</div><div class="line">	<span class="keyword">pid_t</span> pid;</div><div class="line">	<span class="comment">//返回两次，父进程中返回子进程pid，子进程中返回0</span></div><div class="line">	pid = fork();</div><div class="line">	<span class="keyword">if</span>(pid&gt;<span class="number">0</span>)</div><div class="line">	&#123;</div><div class="line">		<span class="keyword">while</span>(<span class="number">1</span>)&#123;</div><div class="line">			<span class="built_in">printf</span>(<span class="string">"父进程\n"</span>);</div><div class="line">			sleep(<span class="number">1</span>);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(pid==<span class="number">0</span>)&#123;</div><div class="line">		<span class="keyword">while</span>(<span class="number">1</span>)&#123;</div><div class="line">			<span class="built_in">printf</span>(<span class="string">"子进程\n"</span>);</div><div class="line">			sleep(<span class="number">3</span>);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">else</span>&#123;</div><div class="line">		perror(<span class="string">"fork\n"</span>);</div><div class="line">		<span class="built_in">exit</span>(<span class="number">1</span>);</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> <span class="number">0</span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line">  fork()之后，父进程和子进程会一起执行，此时就会不断输出打印，这也是在同一个方法内，有两个死循环能够一直运行的原因，代表着不同的进程。</div></pre></td></tr></table></figure>
+<h3 id="3-1-4-读时共享，写时复制-copy-on-write"><a href="#3-1-4-读时共享，写时复制-copy-on-write" class="headerlink" title="3.1.4 读时共享，写时复制(copy on write)"></a>3.1.4 读时共享，写时复制(copy on write)</h3><ol>
+<li>读时共享：通过fork出来的多个进程，在没有变量需要修改时，单纯读取时，是在物理内存中指向同一块空间。<br> 节省物理内存<br>节省复制内容时所消耗的资源（此时消耗是每个进程唯一的PCB）</li>
+<li>写时复制：通过fork出来的多个进程，在需要写时，变量需要修改，此时才将进程的用户空间中的内存指向不同的物理内存。 </li>
 </ol>
-</blockquote>
-<h1 id="4-AQS的类结构"><a href="#4-AQS的类结构" class="headerlink" title="4. AQS的类结构"></a>4. AQS的类结构</h1><p><img src="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/5/AQS%E7%BB%93%E6%9E%84.png" alt=""></p>
-<blockquote>
+<h3 id="3-1-5-文件权限"><a href="#3-1-5-文件权限" class="headerlink" title="3.1.5 文件权限"></a>3.1.5 文件权限</h3><p>  -rwsrwsrwt:07777</p>
 <ol>
-<li>state：用volatile修饰，保证可见性，表示当前锁的状态<br>1.1 在ReentrantLock中，state是已经重入（同一线程多次获取锁）的次数<br>1.2 在CountDownLatch中，state是锁存器的计数，也就是需要都少次countDown</li>
-<li>Node:实现等待队列，将未能获取到锁的线程通过队列形式存储起来 </li>
-<li>ConditionObject：实现Condition的功能（等待，唤醒）</li>
+<li>第一位rws中的s(4)：以文件所有者的身份去运行程序;此时实际用户ID为真实用户ID，有效用户ID为文件所有者ID。</li>
+<li>第二位rws中的s(2)：以文件所有组的身份去运行程序</li>
+<li>第三位rwt中的t(1)：粘滞位;针对目录，除了文件创建者和root之外其他用户不可删除<br>存在意义</li>
+<li>s：以文件所有者身份运行程序，比如修改密码用命令passwd，存在与/usr/bin/passwd，权限是-rwsr-xr-x 则这个命令将以文件所有者身份运行，即root，此时便能修改真正的密码文件/etc/passwd了，不然普通用户是无法修改的。</li>
+<li>t：比如/tmp目录，权限为drwxrwxrwt，而临时目录/tmp是每个用户都有权限操作的，但又要防止其他用户删除了另一用户创建的目录，就需要用到粘滞位了。</li>
+<li>大写与小写<br>s：小写，表示权限中有x，可执行权限<br>S：大写，表示权限中没有x，没有可执行权限</li>
 </ol>
-</blockquote>
-<h1 id="5-AQS的两种模式：独占和共享"><a href="#5-AQS的两种模式：独占和共享" class="headerlink" title="5. AQS的两种模式：独占和共享"></a>5. AQS的两种模式：独占和共享</h1><h3 id="acquire-的实现"><a href="#acquire-的实现" class="headerlink" title="acquire()的实现"></a>acquire()的实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">acquire</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (!tryAcquire(arg) &amp;&amp;<span class="comment">//尝试获取锁，获取得到的话， &amp;&amp;后则不执行</span></div><div class="line">            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))<span class="comment">//获取不到时添加到等待队列并挂起等待的线程</span></div><div class="line">            selfInterrupt();</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h3 id="tryAcquire-是由子类实现，当前讨论ReentrantLock中的FairSync-tryAcquire"><a href="#tryAcquire-是由子类实现，当前讨论ReentrantLock中的FairSync-tryAcquire" class="headerlink" title="tryAcquire()是由子类实现，当前讨论ReentrantLock中的FairSync.tryAcquire()"></a>tryAcquire()是由子类实现，当前讨论ReentrantLock中的FairSync.tryAcquire()</h3><p>可以画图表示逻辑关系<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">tryAcquire</span><span class="params">(<span class="keyword">int</span> acquires)</span> </span>&#123;</div><div class="line">            <span class="keyword">final</span> Thread current = Thread.currentThread();</div><div class="line">            <span class="keyword">int</span> c = getState();<span class="comment">//得到当前锁的状态，得到AQS中的state变量</span></div><div class="line">            <span class="keyword">if</span> (c == <span class="number">0</span>) &#123;<span class="comment">//当前锁未被使用</span></div><div class="line">                <span class="keyword">if</span> (!hasQueuedPredecessors() &amp;&amp;<span class="comment">//当前等待队列为空：在非公平锁（NonFairSync）中则没有这行代码，这是公平锁和非公平锁的一个区别</span></div><div class="line">                compareAndSetState(<span class="number">0</span>, acquires)) &#123;<span class="comment">//通过CAS获取锁</span></div><div class="line">                    setExclusiveOwnerThread(current);<span class="comment">//设置当前锁拥有者为当前线程</span></div><div class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (current == getExclusiveOwnerThread()) &#123;<span class="comment">//当前锁被占用情况下：要是锁占有者是当前线程，即是可以再次获取锁</span></div><div class="line">                <span class="keyword">int</span> nextc = c + acquires;<span class="comment">//锁状态增加，即重入锁次数？</span></div><div class="line">                <span class="keyword">if</span> (nextc &lt; <span class="number">0</span>)</div><div class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Maximum lock count exceeded"</span>);</div><div class="line">                setState(nextc);</div><div class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">        &#125;</div></pre></td></tr></table></figure></p>
-<h3 id="addWaiter"><a href="#addWaiter" class="headerlink" title="addWaiter()"></a>addWaiter()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * Creates and enqueues node for current thread and given mode.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> mode Node.EXCLUSIVE for exclusive, Node.SHARED for shared</div><div class="line">     Node.EXCLUSIVE:独占模式</div><div class="line">     Node.SHARED:共享模式</div><div class="line">     * <span class="doctag">@return</span> the new node</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">private</span> Node <span class="title">addWaiter</span><span class="params">(Node mode)</span> </span>&#123;</div><div class="line">        Node node = <span class="keyword">new</span> Node(Thread.currentThread(), mode);</div><div class="line">        <span class="comment">// Try the fast path of enq; backup to full enq on failure</span></div><div class="line">        Node pred = tail;</div><div class="line">        <span class="comment">//tail！=null，则有等待队列，尝试添加到尾部</span></div><div class="line">        <span class="keyword">if</span> (pred != <span class="keyword">null</span>) &#123;</div><div class="line">            node.prev = pred;<span class="comment">//设置尾节点与新添加节点的关系</span></div><div class="line">            <span class="keyword">if</span> (compareAndSetTail(pred, node)) &#123;<span class="comment">//CAS设置尾节点，失败则enq(node)</span></div><div class="line">                pred.next = node;</div><div class="line">                <span class="keyword">return</span> node;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//tail==null时，则等待队列还没形成</span></div><div class="line">        enq(node);<span class="comment">//存在并发，自旋形式修改</span></div><div class="line">        <span class="keyword">return</span> node;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h3 id="enq-初始化等待队列，设置头结点"><a href="#enq-初始化等待队列，设置头结点" class="headerlink" title="enq():初始化等待队列，设置头结点"></a>enq():初始化等待队列，设置头结点</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> Node <span class="title">enq</span><span class="params">(<span class="keyword">final</span> Node node)</span> </span>&#123;</div><div class="line">        <span class="keyword">for</span> (;;) &#123;</div><div class="line">            Node t = tail;</div><div class="line">            <span class="keyword">if</span> (t == <span class="keyword">null</span>) &#123; <span class="comment">// Must initialize</span></div><div class="line">                <span class="keyword">if</span> (compareAndSetHead(<span class="keyword">new</span> Node()))</div><div class="line">                    tail = head;</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                node.prev = t;</div><div class="line">                <span class="keyword">if</span> (compareAndSetTail(t, node)) &#123;</div><div class="line">                    t.next = node;</div><div class="line">                    <span class="keyword">return</span> t;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h3 id="acquireQueued"><a href="#acquireQueued" class="headerlink" title="acquireQueued()"></a>acquireQueued()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">acquireQueued</span><span class="params">(<span class="keyword">final</span> Node node, <span class="keyword">int</span> arg)</span> </span>&#123;<span class="comment">//通过addWaiter方法返回的node是尾节点</span></div><div class="line">        <span class="keyword">boolean</span> failed = <span class="keyword">true</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">boolean</span> interrupted = <span class="keyword">false</span>;</div><div class="line">            <span class="keyword">for</span> (;;) &#123;</div><div class="line">                <span class="keyword">final</span> Node p = node.predecessor();<span class="comment">//获取等待队列</span></div><div class="line">                <span class="keyword">if</span> (p == head &amp;&amp; tryAcquire(arg)) &#123;<span class="comment">//获取锁成功</span></div><div class="line">                    setHead(node);<span class="comment">//设置头？什么的头？</span></div><div class="line">                    p.next = <span class="keyword">null</span>; <span class="comment">// help GC</span></div><div class="line">                    failed = <span class="keyword">false</span>;</div><div class="line">                    <span class="keyword">return</span> interrupted;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">if</span> (shouldParkAfterFailedAcquire(p, node) &amp;&amp;</div><div class="line">                    parkAndCheckInterrupt())</div><div class="line">                    interrupted = <span class="keyword">true</span>;</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            <span class="keyword">if</span> (failed)</div><div class="line">                cancelAcquire(node);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h2 id="3-2-exec"><a href="#3-2-exec" class="headerlink" title="3.2 exec()"></a>3.2 exec()</h2><ol>
+<li><p>覆盖原有的APP代码段:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"> 	<span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></div><div class="line">&#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"APP前置代码\n"</span>);</div><div class="line">	execl(<span class="string">"/bin/ls"</span>,<span class="string">"ls"</span>,<span class="string">"-l"</span>,<span class="string">"exec.c"</span>,<span class="literal">NULL</span>);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"APP后置代码\n"</span>);</div><div class="line">	<span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div><div class="line">执行结果为：</div><div class="line">	APP前置代码</div><div class="line">	-rw-rw-r-- <span class="number">1</span> peisehn peisehn <span class="number">173</span> <span class="number">10</span>月 <span class="number">26</span> <span class="number">10</span>:<span class="number">25</span> exec.c</div></pre></td></tr></table></figure>
+<p> 因为execl执行时，会替换掉原有APP的代码为自己方法中需要执行的命令代码，此时调用完execl后面的代码则不会执行,因为代码已经被替换掉了。</p>
+</li>
+<li>返回值为新线程返回值<br> 如上代码，return 0不会被执行，真正返回值为execl中的命令返回值。</li>
+<li>exec族<br> execl:指定程序的路径(l:list列表的形式)<br>execlp:将从path环境变量中寻找程序，不需要指定路径(p：path路径)<br>execv:参数通过数组形式传入<br>execle:指定环境变量（e：evn环境变量）<br>execvp:结合上面<br>execve:结合上面(上面函数最终都是调用这个函数，系统函数，上面的函数是c提供的函数库)</li>
+<li>shell执行原理<br> shell执行命令时，会通过fork复制出一个子进程，shell子进程再通过exec来将需要执行的命令程序中的代码段覆盖在<br>原有shell的子进程中，此时便实现了通过shell子进程来执行命令了。</li>
+</ol>
+<h2 id="3-3-wait"><a href="#3-3-wait" class="headerlink" title="3.3 wait()"></a>3.3 wait()</h2><ol>
+<li>父进程回收子进程的PCB：回收僵尸状态下的子进程<br> 僵尸进程：进程的用户空间已被释放，而PCB还未被释放<br>   存在意义：让父进程能够知道子进程是如何死的，得到子进程的一些信息，通过wait函数能够让父进程在子进程的pid,还没分配给其他进程时，就先通知父进程，让父进程能够得到相关信息作出进一步操作。</li>
+<li>阻塞方法：成功释放返回子进程的pid，失败则返回-1</li>
+<li>waitpid(pid,status,options):可设置非阻塞方式回收子进程<br> pid:指定回收子进程的类型;如同一进程组的所有子进程<br>status:存储进程的终止信息<br>options:WNOHANG表示非阻塞–&gt;返回0则没回收成功立即返回，返回-1则回收失败，返回其他则表示回收成功。</li>
+<li>进程组：父子进程属于同个进程组，可通过kill来杀掉同个进程组的进程，需带上负号。kill -9 -23452</li>
+<li>孤儿进程<br> 当父进程结束时，子进程还没被父进程回收，此时子进程就会变成孤儿进程<br>孤儿进程将由1号进程（init进程）领养，即init进程成为孤儿进程的父进程，负责回收孤儿进程。</li>
+</ol>
 
       
 
@@ -211,7 +249,15 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">java并发</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">进程</a>
         		</li>
       		
 		</ul>
@@ -278,7 +324,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://118.89.22.123/2017/06/30/AQS分析/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://118.89.22.123/2017/10/28/Linux系统编程（三）进程笔记/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -292,18 +338,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/07/03/字节码执行过程分析/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          字节码执行过程分析
-        
-      </div>
-    </a>
   
-  
-    <a href="/2017/06/26/实现CountDownLatch相似功能/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">实现CountDownLatch相似功能</div>
+    <a href="/2017/10/12/Linux系统编程（一）IO笔记/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Linux系统编程（一）：文件IO</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -330,7 +367,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-AQS介绍"><span class="toc-number">1.</span> <span class="toc-text">1. AQS介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-AQS和Synchronized"><span class="toc-number">2.</span> <span class="toc-text">2. AQS和Synchronized</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-设计AQS的思路"><span class="toc-number">3.</span> <span class="toc-text">3. 设计AQS的思路</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-AQS的类结构"><span class="toc-number">4.</span> <span class="toc-text">4. AQS的类结构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-AQS的两种模式：独占和共享"><span class="toc-number">5.</span> <span class="toc-text">5. AQS的两种模式：独占和共享</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#acquire-的实现"><span class="toc-number">5.0.1.</span> <span class="toc-text">acquire()的实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tryAcquire-是由子类实现，当前讨论ReentrantLock中的FairSync-tryAcquire"><span class="toc-number">5.0.2.</span> <span class="toc-text">tryAcquire()是由子类实现，当前讨论ReentrantLock中的FairSync.tryAcquire()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#addWaiter"><span class="toc-number">5.0.3.</span> <span class="toc-text">addWaiter()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#enq-初始化等待队列，设置头结点"><span class="toc-number">5.0.4.</span> <span class="toc-text">enq():初始化等待队列，设置头结点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#acquireQueued"><span class="toc-number">5.0.5.</span> <span class="toc-text">acquireQueued()</span></a></li></ol></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-进程相关命令"><span class="toc-number">1.</span> <span class="toc-text">1. 进程相关命令</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-进程相关概念"><span class="toc-number">2.</span> <span class="toc-text">2. 进程相关概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-虚拟内存与进程"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 虚拟内存与进程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-page页"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 page页</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-进程切换"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 进程切换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-父进程与子进程"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 父进程与子进程</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-进程相关函数"><span class="toc-number">3.</span> <span class="toc-text">3. 进程相关函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-fork"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 fork</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1-作用"><span class="toc-number">3.1.1.</span> <span class="toc-text">3.1.1 作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2-细节"><span class="toc-number">3.1.2.</span> <span class="toc-text">3.1.2 细节</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-3-代码使用"><span class="toc-number">3.1.3.</span> <span class="toc-text">3.1.3 代码使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-4-读时共享，写时复制-copy-on-write"><span class="toc-number">3.1.4.</span> <span class="toc-text">3.1.4 读时共享，写时复制(copy on write)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-5-文件权限"><span class="toc-number">3.1.5.</span> <span class="toc-text">3.1.5 文件权限</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-exec"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 exec()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-wait"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 wait()</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>

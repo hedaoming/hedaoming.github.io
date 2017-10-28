@@ -6,21 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://118.89.22.123">
-  <title>AbstractQueuedSynchronizer源码分析 | peishen&#39;s blog</title>
+  <title>Tag: 进程 | peishen&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的tryAcquire和tryRelease方法的，所以了解AQS的原理以及结构有助于了解其他并发类。">
-<meta name="keywords" content="java并发">
-<meta property="og:type" content="article">
-<meta property="og:title" content="AbstractQueuedSynchronizer源码分析">
-<meta property="og:url" content="http://118.89.22.123/2017/06/30/AQS分析/index.html">
+  <meta name="description" content="ר�з�����Java��̨�������ȿ��������ż������ߣ����Ը����鼮��">
+<meta name="keywords" content="Java,Spring,jquery,MyBatis,Java����,������,����Գ,������,����,���,����,��Դ,IT��վ,Developer,Programmer,Coder,Geek,,�û�����">
+<meta property="og:type" content="website">
+<meta property="og:title" content="peishen&#39;s blog">
+<meta property="og:url" content="http://118.89.22.123/tags/进程/index.html">
 <meta property="og:site_name" content="peishen&#39;s blog">
-<meta property="og:description" content="1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的tryAcquire和tryRelease方法的，所以了解AQS的原理以及结构有助于了解其他并发类。">
-<meta property="og:image" content="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/5/AQS%E7%BB%93%E6%9E%84.png">
-<meta property="og:updated_time" content="2017-08-31T11:36:52.648Z">
+<meta property="og:description" content="ר�з�����Java��̨�������ȿ��������ż������ߣ����Ը����鼮��">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="AbstractQueuedSynchronizer源码分析">
-<meta name="twitter:description" content="1. AQS介绍AQS全名是AbstractQueuedSynchronizer，是JUC（java并发包）的一个同步工具类，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的tryAcquire和tryRelease方法的，所以了解AQS的原理以及结构有助于了解其他并发类。">
-<meta name="twitter:image" content="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/5/AQS%E7%BB%93%E6%9E%84.png">
+<meta name="twitter:title" content="peishen&#39;s blog">
+<meta name="twitter:description" content="ר�з�����Java��̨�������ȿ��������ż������ߣ����Ը����鼮��">
   
     <link rel="alternative" href="/atom.xml" title="peishen&#39;s blog" type="application/atom+xml">
   
@@ -156,68 +153,56 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-AQS分析" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      AbstractQueuedSynchronizer源码分析
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2017" class="archive-year">2017</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2017/10/28/Linux系统编程（三）进程笔记/" class="archive-article-date">
+  	<time datetime="2017-10-27T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-10-28</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2017/10/28/Linux系统编程（三）进程笔记/">Linux系统编程（三）：进程</a>
     </h1>
   
 
-        
-        <a href="/2017/06/30/AQS分析/" class="archive-article-date">
-  	<time datetime="2017-06-29T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-06-30</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-AQS介绍"><a href="#1-AQS介绍" class="headerlink" title="1. AQS介绍"></a>1. AQS介绍</h1><p>AQS全名是<font color="red">AbstractQueuedSynchronizer</font>，是JUC（java并发包）的一个<font color="red">同步工具类</font>，是很多并发类的基础，比如ReentrantLock，CountDownLatch，ReentrantReadWriteLock等都是继承AQS，然后再自己实现相应的tryAcquire和tryRelease方法的，所以<font color="red">了解AQS的原理以及结构有助于了解其他并发类</font>。<br><a id="more"></a></p>
-<h1 id="2-AQS和Synchronized"><a href="#2-AQS和Synchronized" class="headerlink" title="2. AQS和Synchronized"></a>2. AQS和Synchronized</h1><h1 id="3-设计AQS的思路"><a href="#3-设计AQS的思路" class="headerlink" title="3. 设计AQS的思路"></a>3. 设计AQS的思路</h1><p>AQS也可以当作是一个同步器，通过同步器来实现锁的功能，控制线程获取资源以及挂起或唤醒线程，从最基础角度来说，AQS定义了如何<font color="red">获取以及释放锁</font>，而获取以及释放锁的操作离不开三个基本点</p>
-<blockquote>
-<ol>
-<li>原子操作：CAS</li>
-<li>等待对列：CLH Lock queue（实现自旋锁，不用挂起到OS，节省资源），通过Node来实现</li>
-<li>挂起或唤醒：LockSupport.park(),LockSupport.unpark();</li>
-</ol>
-</blockquote>
-<h1 id="4-AQS的类结构"><a href="#4-AQS的类结构" class="headerlink" title="4. AQS的类结构"></a>4. AQS的类结构</h1><p><img src="https://github.com/hedaoming/peishen.github.io/raw/master/2017/07/5/AQS%E7%BB%93%E6%9E%84.png" alt=""></p>
-<blockquote>
-<ol>
-<li>state：用volatile修饰，保证可见性，表示当前锁的状态<br>1.1 在ReentrantLock中，state是已经重入（同一线程多次获取锁）的次数<br>1.2 在CountDownLatch中，state是锁存器的计数，也就是需要都少次countDown</li>
-<li>Node:实现等待队列，将未能获取到锁的线程通过队列形式存储起来 </li>
-<li>ConditionObject：实现Condition的功能（等待，唤醒）</li>
-</ol>
-</blockquote>
-<h1 id="5-AQS的两种模式：独占和共享"><a href="#5-AQS的两种模式：独占和共享" class="headerlink" title="5. AQS的两种模式：独占和共享"></a>5. AQS的两种模式：独占和共享</h1><h3 id="acquire-的实现"><a href="#acquire-的实现" class="headerlink" title="acquire()的实现"></a>acquire()的实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">acquire</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (!tryAcquire(arg) &amp;&amp;<span class="comment">//尝试获取锁，获取得到的话， &amp;&amp;后则不执行</span></div><div class="line">            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))<span class="comment">//获取不到时添加到等待队列并挂起等待的线程</span></div><div class="line">            selfInterrupt();</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h3 id="tryAcquire-是由子类实现，当前讨论ReentrantLock中的FairSync-tryAcquire"><a href="#tryAcquire-是由子类实现，当前讨论ReentrantLock中的FairSync-tryAcquire" class="headerlink" title="tryAcquire()是由子类实现，当前讨论ReentrantLock中的FairSync.tryAcquire()"></a>tryAcquire()是由子类实现，当前讨论ReentrantLock中的FairSync.tryAcquire()</h3><p>可以画图表示逻辑关系<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">tryAcquire</span><span class="params">(<span class="keyword">int</span> acquires)</span> </span>&#123;</div><div class="line">            <span class="keyword">final</span> Thread current = Thread.currentThread();</div><div class="line">            <span class="keyword">int</span> c = getState();<span class="comment">//得到当前锁的状态，得到AQS中的state变量</span></div><div class="line">            <span class="keyword">if</span> (c == <span class="number">0</span>) &#123;<span class="comment">//当前锁未被使用</span></div><div class="line">                <span class="keyword">if</span> (!hasQueuedPredecessors() &amp;&amp;<span class="comment">//当前等待队列为空：在非公平锁（NonFairSync）中则没有这行代码，这是公平锁和非公平锁的一个区别</span></div><div class="line">                compareAndSetState(<span class="number">0</span>, acquires)) &#123;<span class="comment">//通过CAS获取锁</span></div><div class="line">                    setExclusiveOwnerThread(current);<span class="comment">//设置当前锁拥有者为当前线程</span></div><div class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (current == getExclusiveOwnerThread()) &#123;<span class="comment">//当前锁被占用情况下：要是锁占有者是当前线程，即是可以再次获取锁</span></div><div class="line">                <span class="keyword">int</span> nextc = c + acquires;<span class="comment">//锁状态增加，即重入锁次数？</span></div><div class="line">                <span class="keyword">if</span> (nextc &lt; <span class="number">0</span>)</div><div class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Maximum lock count exceeded"</span>);</div><div class="line">                setState(nextc);</div><div class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">        &#125;</div></pre></td></tr></table></figure></p>
-<h3 id="addWaiter"><a href="#addWaiter" class="headerlink" title="addWaiter()"></a>addWaiter()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * Creates and enqueues node for current thread and given mode.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> mode Node.EXCLUSIVE for exclusive, Node.SHARED for shared</div><div class="line">     Node.EXCLUSIVE:独占模式</div><div class="line">     Node.SHARED:共享模式</div><div class="line">     * <span class="doctag">@return</span> the new node</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">private</span> Node <span class="title">addWaiter</span><span class="params">(Node mode)</span> </span>&#123;</div><div class="line">        Node node = <span class="keyword">new</span> Node(Thread.currentThread(), mode);</div><div class="line">        <span class="comment">// Try the fast path of enq; backup to full enq on failure</span></div><div class="line">        Node pred = tail;</div><div class="line">        <span class="comment">//tail！=null，则有等待队列，尝试添加到尾部</span></div><div class="line">        <span class="keyword">if</span> (pred != <span class="keyword">null</span>) &#123;</div><div class="line">            node.prev = pred;<span class="comment">//设置尾节点与新添加节点的关系</span></div><div class="line">            <span class="keyword">if</span> (compareAndSetTail(pred, node)) &#123;<span class="comment">//CAS设置尾节点，失败则enq(node)</span></div><div class="line">                pred.next = node;</div><div class="line">                <span class="keyword">return</span> node;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//tail==null时，则等待队列还没形成</span></div><div class="line">        enq(node);<span class="comment">//存在并发，自旋形式修改</span></div><div class="line">        <span class="keyword">return</span> node;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h3 id="enq-初始化等待队列，设置头结点"><a href="#enq-初始化等待队列，设置头结点" class="headerlink" title="enq():初始化等待队列，设置头结点"></a>enq():初始化等待队列，设置头结点</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> Node <span class="title">enq</span><span class="params">(<span class="keyword">final</span> Node node)</span> </span>&#123;</div><div class="line">        <span class="keyword">for</span> (;;) &#123;</div><div class="line">            Node t = tail;</div><div class="line">            <span class="keyword">if</span> (t == <span class="keyword">null</span>) &#123; <span class="comment">// Must initialize</span></div><div class="line">                <span class="keyword">if</span> (compareAndSetHead(<span class="keyword">new</span> Node()))</div><div class="line">                    tail = head;</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                node.prev = t;</div><div class="line">                <span class="keyword">if</span> (compareAndSetTail(t, node)) &#123;</div><div class="line">                    t.next = node;</div><div class="line">                    <span class="keyword">return</span> t;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h3 id="acquireQueued"><a href="#acquireQueued" class="headerlink" title="acquireQueued()"></a>acquireQueued()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">acquireQueued</span><span class="params">(<span class="keyword">final</span> Node node, <span class="keyword">int</span> arg)</span> </span>&#123;<span class="comment">//通过addWaiter方法返回的node是尾节点</span></div><div class="line">        <span class="keyword">boolean</span> failed = <span class="keyword">true</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">boolean</span> interrupted = <span class="keyword">false</span>;</div><div class="line">            <span class="keyword">for</span> (;;) &#123;</div><div class="line">                <span class="keyword">final</span> Node p = node.predecessor();<span class="comment">//获取等待队列</span></div><div class="line">                <span class="keyword">if</span> (p == head &amp;&amp; tryAcquire(arg)) &#123;<span class="comment">//获取锁成功</span></div><div class="line">                    setHead(node);<span class="comment">//设置头？什么的头？</span></div><div class="line">                    p.next = <span class="keyword">null</span>; <span class="comment">// help GC</span></div><div class="line">                    failed = <span class="keyword">false</span>;</div><div class="line">                    <span class="keyword">return</span> interrupted;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">if</span> (shouldParkAfterFailedAcquire(p, node) &amp;&amp;</div><div class="line">                    parkAndCheckInterrupt())</div><div class="line">                    interrupted = <span class="keyword">true</span>;</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            <span class="keyword">if</span> (failed)</div><div class="line">                cancelAcquire(node);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">java并发</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">进程</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -230,141 +215,17 @@
 	</div>
 
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://118.89.22.123/2017/06/30/AQS分析/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2017/07/03/字节码执行过程分析/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          字节码执行过程分析
-        
-      </div>
-    </a>
   
   
-    <a href="/2017/06/26/实现CountDownLatch相似功能/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">实现CountDownLatch相似功能</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-        <div class="toc-container tooltip-left">
-            <i class="icon-font icon-category"></i>
-            <div class="tooltip tooltip-east">
-                <span class="tooltip-item">
-                </span>
-                <span class="tooltip-content">
-                    <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-AQS介绍"><span class="toc-number">1.</span> <span class="toc-text">1. AQS介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-AQS和Synchronized"><span class="toc-number">2.</span> <span class="toc-text">2. AQS和Synchronized</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-设计AQS的思路"><span class="toc-number">3.</span> <span class="toc-text">3. 设计AQS的思路</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-AQS的类结构"><span class="toc-number">4.</span> <span class="toc-text">4. AQS的类结构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-AQS的两种模式：独占和共享"><span class="toc-number">5.</span> <span class="toc-text">5. AQS的两种模式：独占和共享</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#acquire-的实现"><span class="toc-number">5.0.1.</span> <span class="toc-text">acquire()的实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tryAcquire-是由子类实现，当前讨论ReentrantLock中的FairSync-tryAcquire"><span class="toc-number">5.0.2.</span> <span class="toc-text">tryAcquire()是由子类实现，当前讨论ReentrantLock中的FairSync.tryAcquire()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#addWaiter"><span class="toc-number">5.0.3.</span> <span class="toc-text">addWaiter()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#enq-初始化等待队列，设置头结点"><span class="toc-number">5.0.4.</span> <span class="toc-text">enq():初始化等待队列，设置头结点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#acquireQueued"><span class="toc-number">5.0.5.</span> <span class="toc-text">acquireQueued()</span></a></li></ol></li></ol></li></ol>
-                    </div>
-                </span>
-            </div>
-        </div>
-        
-    </div>
-</aside>
-
-
-
-	
-		<!-- ������City�氲װ���� -->
-<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTYyOC82MTk2">
-<script type="text/javascript">
-   (function(d, s) {
-       var j, e = d.getElementsByTagName(s)[0];
-       if (typeof LivereTower === 'function') { return; }
-       j = d.createElement(s);
-       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-       j.async = true;
-       e.parentNode.insertBefore(j, e);
-   })(document, 'script');
-</script>
-<noscript>Ϊ����ʹ�����������۹����뼤��JavaScript</noscript>
-</div>
-<!-- City�氲װ��������� -->
-	
-  
-  
+    </div></section>
   
 
-  
-
-  
+    
 
 
           </div>
@@ -392,9 +253,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
